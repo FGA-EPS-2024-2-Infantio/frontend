@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
+import { useUser } from '@auth0/nextjs-auth0/client'
 
 interface DataType {
   key: string
@@ -23,10 +24,16 @@ export default function Schools() {
   const { schools, loading, error } = useSelector(
     (state: RootState) => state.school
   )
+  
+  const { user, isLoading } = useUser()
 
   useEffect(() => {
-    dispatch(fetchSchools())
-  }, [dispatch])
+    if (!isLoading && !user) {
+      router.push('/api/auth/login')
+    } else if (user) {
+      dispatch(fetchSchools())
+    }
+  }, [user, isLoading, dispatch, router])
 
   useEffect(() => {
     if (error) {
@@ -66,7 +73,9 @@ export default function Schools() {
     router.push(`/escolas/${record.key}`)
   }
 
-  return (
+  if (isLoading) return <div>Carregando...</div>
+
+  return user ? (
     <div className='mx-6 rounded-lg bg-white p-6 shadow-lg'>
       <div className='mb-4 flex items-center justify-between'>
         <h2 className='text-lg font-semibold'>Gerenciamento de escolas</h2>
@@ -91,5 +100,5 @@ export default function Schools() {
         setIsModalOpen={setIsModalOpen}
       />
     </div>
-  )
+  ) : null
 }
