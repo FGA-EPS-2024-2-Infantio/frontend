@@ -35,7 +35,7 @@ export default function ModalSaveTeacher({
         name: teacherToEdit.name,
         age: teacherToEdit.age,
         cpf: teacherToEdit.cpf,
-        startDate: teacherToEdit.startDate ? moment(teacherToEdit.startDate) : null // Certifique-se de usar `moment`
+        startDate: teacherToEdit.startDate // Certifique-se de usar `moment`
       })
     }
   }, [teacherToEdit, form])
@@ -47,7 +47,7 @@ export default function ModalSaveTeacher({
       // Converte `startDate` para `Date` ao salvar
       const teacherData: CreateTeacherType = {
         ...values,
-        startDate: values.startDate ? values.startDate.toDate() : null,
+        startDate: values.startDate,
       };
 
       if (teacherToEdit) {
@@ -143,7 +143,7 @@ export default function ModalSaveTeacher({
             placeholder="Data de Início"
             format="DD/MM/YYYY"
             value={form.getFieldValue('startDate') ? moment(form.getFieldValue('startDate')) : null} // Certifique-se de que o valor seja `moment`
-            onChange={(date) => form.setFieldValue('startDate', date ? date.toDate() : null)} // Converte para `Date`
+            onChange={(date) => form.setFieldValue('startDate', date)} // Converte para `Date`
           />
         </Form.Item>
 
