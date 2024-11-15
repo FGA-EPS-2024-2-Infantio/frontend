@@ -85,14 +85,11 @@ export default function Teachers() {
         onRow={record => ({
           onClick: () => handleRowClick(record)
         })}
-        // rowClassName={({ disabled }) =>
-        //   classNames(
-        //     'cursor-pointer hover:bg-gray-100 transition duration-200',
-        //     {
-        //       'bg-red-100 hover:!bg-red-200': disabled
-        //     }
-        //   )
-        // }
+        rowClassName={({  }) =>
+          classNames(
+            'cursor-pointer hover:bg-gray-100 transition duration-200',
+          )
+        }
         rowHoverable={false}
         bordered
         loading={loading}
