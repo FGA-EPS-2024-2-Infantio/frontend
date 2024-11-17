@@ -9,4 +9,6 @@ export type SchoolResponseDto = {
   name: string
   directorEmail: string
   numberStudents: number
+  disabled: boolean
+  createdAt: Date
 }

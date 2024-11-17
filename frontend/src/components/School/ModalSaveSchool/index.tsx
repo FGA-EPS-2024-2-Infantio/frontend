@@ -1,45 +1,77 @@
 'use client'
 
-import { createSchool, fetchSchools } from '@/store/slices/schoolSlice'
+import { createSchool, fetchSchoolById, fetchSchools, updateSchool } from '@/store/slices/schoolSlice'
 import { AppDispatch, RootState } from '@/store/store'
-import { CreateSchoolType } from '@/types/Schools'
+import { CreateSchoolType, SchoolResponseDto } from '@/types/Schools'
 import { Button, Form, Input, InputNumber, Modal } from 'antd'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 type Props = {
   isModalOpen: boolean
   setIsModalOpen: (state: boolean) => void
+  schoolToEdit?: SchoolResponseDto
 }
 
-export default function ModalCreateSchool({
+export default function ModalSaveSchool({
   isModalOpen,
-  setIsModalOpen
+  setIsModalOpen,
+  schoolToEdit
 }: Props) {
   const [form] = Form.useForm<CreateSchoolType>()
+  const dispatch = useDispatch<AppDispatch>()
+  const { loading } = useSelector((state: RootState) => state.school)
 
   const handleCancel = () => {
     form.resetFields()
     setIsModalOpen(false)
   }
 
-  const dispatch = useDispatch<AppDispatch>()
-  const { loading } = useSelector((state: RootState) => state.school)
+  useEffect(() => {
+    if (schoolToEdit) {
+      form.setFieldsValue({
+        name: schoolToEdit.name,
+        directorEmail: schoolToEdit.directorEmail,
+        numberStudents: schoolToEdit.numberStudents
+      })
+    }
+  }, [schoolToEdit, form])
 
-  const handleCreateSchool = async () => {
+  const handleSaveSchool = async () => {
     try {
       const values = await form.validateFields()
-      const action = await dispatch(createSchool(values))
 
-      if (createSchool.rejected.match(action)) {
-        toast.error(
-          `Erro ao criar escola: ${action.payload || 'Erro ao criar escola'}`
+      if (schoolToEdit) {
+        const action = await dispatch(
+          updateSchool({
+            id: schoolToEdit.id,
+            data: values
+          })
         )
+
+        if (updateSchool.rejected.match(action)) {
+          toast.error(
+            `Erro ao atualizar escola: ${action.payload || 'Erro ao atualizar escola'}`
+          )
+        } else {
+          toast.success('Escola atualizada com sucesso')
+          setIsModalOpen(false)
+          dispatch(fetchSchools())
+          dispatch(fetchSchoolById(schoolToEdit.id))
+        }
       } else {
-        setIsModalOpen(false)
-        dispatch(fetchSchools());
-        toast.success(`Escola criada com sucesso`)
-        form.resetFields()
+        const action = await dispatch(createSchool(values))
+
+        if (createSchool.rejected.match(action)) {
+          toast.error(
+            `Erro ao criar escola: ${action.payload || 'Erro ao criar escola'}`
+          )
+        } else {
+          toast.success('Escola criada com sucesso')
+          setIsModalOpen(false)
+          dispatch(fetchSchools())
+        }
       }
     } catch (error) {
       console.log('Erro ao validar o formulário:', error)
@@ -57,7 +89,7 @@ export default function ModalCreateSchool({
       <Form
         form={form}
         layout='vertical'
-        onFinish={handleCreateSchool}
+        onFinish={handleSaveSchool}
         className='space-y-4'
       >
         <Form.Item
@@ -107,7 +139,7 @@ export default function ModalCreateSchool({
             loading={loading}
             className='bg-blue-500 hover:bg-blue-600'
           >
-            Cadastrar
+            {schoolToEdit ? 'Salvar alterações' : 'Cadastrar'}
           </Button>
         </div>
       </Form>
