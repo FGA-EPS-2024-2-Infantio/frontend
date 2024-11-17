@@ -5,6 +5,7 @@ import type { MenuProps } from 'antd'
 import { Layout, Menu } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const { Sider } = Layout
 
@@ -24,9 +25,13 @@ function getItem(
   } as MenuItem
 }
 
-const items: MenuItem[] = [getItem('Escolas', '1', <HomeOutlined />)]
+const items: MenuItem[] = [
+  getItem('Escolas', '1', <HomeOutlined />),
+  getItem('Sair', '2')
+]
 
 export default function Sidebar() {
+  const { user } = useUser();
   const [collapsed, setCollapsed] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const router = useRouter()
@@ -35,6 +40,10 @@ export default function Sidebar() {
     setSelectedKey(e.key)
     if (e.key === '1') {
       router.push('/escolas')
+    }
+
+    if (e.key === '2') {
+      router.push('api/auth/logout')
     }
   }
 

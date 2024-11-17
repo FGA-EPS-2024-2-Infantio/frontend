@@ -2,12 +2,18 @@
 
 import React from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useRouter } from 'next/navigation'
 
 function Index() {
+  const router = useRouter();
   const { user, error, isLoading } = useUser();
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
+
+  if ( user ) {
+    router.push('/home')
+  }
 
   return (
     <div className='flex flex-1 items-center justify-center p-6'>

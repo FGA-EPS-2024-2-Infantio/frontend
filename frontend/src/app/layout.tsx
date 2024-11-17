@@ -1,6 +1,7 @@
 import { Providers } from '@/providers'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import { UserProvider } from '@auth0/nextjs-auth0/client'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
 
@@ -30,7 +31,11 @@ export default function RootLayout({
       <body
         className={`bg-gradient-to-r from-[#e3f1f2] from-15% via-[#ceebd5] via-45% to-[#e9e7d3] to-100% ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </Providers>
       </body>
     </html>
   )
