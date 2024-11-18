@@ -89,7 +89,7 @@ export default function TeacherDetails() {
           </Button>
         </Dropdown>
       </div>
-      <p className='text-gray-700'>Idade: {teacher.age}</p>
+      <p className='text-gray-700'>Numero de turmas: {teacher.numberOfClasses}</p>
       <p className='text-gray-700'>CPF: {teacher.cpf}</p>
       <p className='text-gray-700'>Data de início: {new Date(teacher.startDate).toLocaleDateString('pt-BR')}</p>
 

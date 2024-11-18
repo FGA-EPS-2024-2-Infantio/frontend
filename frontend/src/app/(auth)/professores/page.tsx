@@ -38,9 +38,9 @@ export default function Teachers() {
       render: text => <strong>{text}</strong>
     },
     {
-      title: 'Idade',
-      dataIndex: 'age',
-      key: 'age'
+      title: 'Número de turmas',
+      dataIndex: 'numberOfClasses',
+      key: 'numberOfClasses'
     },
     {
       title: 'CPF',
@@ -58,7 +58,7 @@ export default function Teachers() {
   const data: TeacherResponseDto[] = teachers.map((teacher:TeacherResponseDto) => ({
     id: teacher.id,
     name: teacher.name,
-    age: teacher.age,
+    numberOfClasses: teacher.numberOfClasses,
     cpf:teacher.cpf,
     startDate: teacher.startDate,
     createdAt: teacher.createdAt

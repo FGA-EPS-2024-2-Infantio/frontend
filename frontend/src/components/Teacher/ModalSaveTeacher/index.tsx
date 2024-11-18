@@ -33,7 +33,7 @@ export default function ModalSaveTeacher({
     if (teacherToEdit) {
       form.setFieldsValue({
         name: teacherToEdit.name,
-        age: teacherToEdit.age,
+        numberOfClasses: teacherToEdit.numberOfClasses,
         cpf: teacherToEdit.cpf,
         startDate: teacherToEdit.startDate // Certifique-se de usar `moment`
       })
@@ -112,14 +112,14 @@ export default function ModalSaveTeacher({
         </Form.Item>
 
         <Form.Item
-          name="age"
-          label="Idade do Professor"
+          name="numberOfClasses"
+          label="Quantidade de turmas"
           rules={[
-            { required: true, message: 'Por favor, insira a idade do professor' },
-            { type: 'number', min: 18, message: 'A idade mínima é 18 anos' }
+            { required: true, message: 'Por favor, insira a quantidade de turmas' },
+            { type: 'number'}
           ]}
         >
-          <InputNumber min={18} className="w-full" placeholder="Idade do Professor" />
+          <InputNumber min={18} className="w-full" placeholder="Quantidade de turmas" />
         </Form.Item>
 
         <Form.Item
