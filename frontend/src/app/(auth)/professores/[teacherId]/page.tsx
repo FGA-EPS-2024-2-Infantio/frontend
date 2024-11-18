@@ -8,9 +8,11 @@ import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
 export default function TeacherDetails() {
-  const { teacherId } = useParams()
+  const { teacherId } = useParams() 
+  const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error, teacher } = useSelector(
     (state: RootState) => state.teacher
@@ -35,6 +37,7 @@ export default function TeacherDetails() {
       .unwrap()
       .then(() => {
         toast.success('Professor deletado com sucesso')
+        router.push('/professores')
       })
       .catch(error => toast.error(`Erro: ${error.message}`))
   }, [dispatch, teacherIdStr])
