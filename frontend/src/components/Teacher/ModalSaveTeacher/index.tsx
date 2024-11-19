@@ -7,7 +7,22 @@ import { Button, DatePicker, Form, Input, InputNumber, Modal } from 'antd'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import moment from 'moment';
+import dayjs from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import localeData from 'dayjs/plugin/localeData'
+import weekday from 'dayjs/plugin/weekday'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import weekYear from 'dayjs/plugin/weekYear'
+import { useRouter } from 'next/navigation'
+import { now } from 'moment'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(advancedFormat)
+dayjs.extend(weekday)
+dayjs.extend(localeData)
+dayjs.extend(weekOfYear)
+dayjs.extend(weekYear)
 
 type Props = {
   isModalOpen: boolean
@@ -24,8 +39,12 @@ export default function ModalSaveTeacher({
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.teacher)
 
+  const router = useRouter();
+
+  form.setFieldValue("startDate", dayjs(form.getFieldValue("startDate")))
+
   const handleCancel = () => {
-    form.resetFields()
+    // form.resetFields()
     setIsModalOpen(false)
   }
 
@@ -35,7 +54,7 @@ export default function ModalSaveTeacher({
         name: teacherToEdit.name,
         numberOfClasses: teacherToEdit.numberOfClasses,
         cpf: teacherToEdit.cpf,
-        startDate: teacherToEdit.startDate // Certifique-se de usar `moment`
+        startDate: dayjs(teacherToEdit.startDate) // Certifique-se de usar `moment`
       })
     }
   }, [teacherToEdit, form])
@@ -46,15 +65,14 @@ export default function ModalSaveTeacher({
 
       // Converte `startDate` para `Date` ao salvar
       const teacherData: CreateTeacherType = {
-        ...values,
-        startDate: values.startDate,
+        ...values
       };
 
       if (teacherToEdit) {
         const action = await dispatch(
           updateTeacher({
             id: teacherToEdit.id,
-            data: teacherData
+            data: values
           })
         )
 
@@ -119,7 +137,7 @@ export default function ModalSaveTeacher({
             { type: 'number'}
           ]}
         >
-          <InputNumber min={18} className="w-full" placeholder="Quantidade de turmas" />
+          <InputNumber min={0} className="w-full" placeholder="Quantidade de turmas" />
         </Form.Item>
 
         <Form.Item
@@ -142,7 +160,7 @@ export default function ModalSaveTeacher({
             className="w-full"
             placeholder="Data de Início"
             format="DD/MM/YYYY"
-            value={form.getFieldValue('startDate') ? moment(form.getFieldValue('startDate')) : null} // Certifique-se de que o valor seja `moment`
+            value={form.getFieldValue("startDate")} // Certifique-se de que o valor seja `moment`
             onChange={(date) => form.setFieldValue('startDate', date)} // Converte para `Date`
           />
         </Form.Item>
