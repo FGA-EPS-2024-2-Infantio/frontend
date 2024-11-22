@@ -1,11 +1,11 @@
 'use client'
 
-import { HomeOutlined } from '@ant-design/icons'
+import { HomeOutlined, UserOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Layout, Menu } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@auth0/nextjs-auth0/client'
 
 const { Sider } = Layout
 
@@ -27,11 +27,12 @@ function getItem(
 
 const items: MenuItem[] = [
   getItem('Escolas', '1', <HomeOutlined />),
-  getItem('Sair', '2')
+  getItem('Alunos', '2', <UserOutlined />),
+  getItem('Sair', '0')
 ]
 
 export default function Sidebar() {
-  const { user } = useUser();
+  const { user } = useUser()
   const [collapsed, setCollapsed] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const router = useRouter()
@@ -40,9 +41,9 @@ export default function Sidebar() {
     setSelectedKey(e.key)
     if (e.key === '1') {
       router.push('/escolas')
-    }
-
-    if (e.key === '2') {
+    } else if (e.key === '2') {
+      router.push('/alunos')
+    } else if (e.key === '0') {
       router.push('api/auth/logout')
     }
   }
