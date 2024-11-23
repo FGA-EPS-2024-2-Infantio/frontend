@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import InputMask from 'react-input-mask';
 import ModalObservacao from '../../../components/Matricula/ModalObservacao/index';
 import ModalResponsavel from '../../../components/Matricula/ModalResponsavel';
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store/store'
 import {Spin } from 'antd'
