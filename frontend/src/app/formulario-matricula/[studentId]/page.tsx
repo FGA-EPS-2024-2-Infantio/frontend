@@ -157,9 +157,10 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
             {/* Dados do Aluno */}
             
            <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
-            <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula do Aluno</h2>
+            <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula</h2>
+            {student.name && (<h2 className="text-2xl font-semibold mb-6">{student.name}</h2>)}
             <div className="md:col-span-2 space-y-6">
-            {student.name && (<h1 className="text-lg font-semibold">Aluno: {student.name}</h1>)}
+            
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Form.Item label="Data de Nascimento" name="dataNascimento">
