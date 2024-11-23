@@ -1,12 +1,16 @@
 'use client'
-
+import { updateStudent, fetchStudentById } from '@/store/slices/studentSlice';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Radio, Table } from 'antd';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useParams } from 'next/navigation';
 import InputMask from 'react-input-mask';
-import ModalObservacao from '../../components/Matricula/ModalObservacao/index';
-import ModalResponsavel from '../../components/Matricula/ModalResponsavel';
+import ModalObservacao from '../../../components/Matricula/ModalObservacao/index';
+import ModalResponsavel from '../../../components/Matricula/ModalResponsavel';
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/store/store'
+import {Spin } from 'antd'
 
 // Tipo para observações
 type Observacao = {
@@ -24,13 +28,25 @@ type Responsavel = {
 };
 
 export default function FormularioMatricula() {
+  const { studentId } = useParams();
+  const studentIdStr = Array.isArray(studentId) ? studentId[0] :studentId;
+  const dispatch = useDispatch<AppDispatch>()
+  const { loading, student } = useSelector(
+    (state: RootState) => state.student
+  );
   const [isModalObservacaoVisible, setIsModalObservacaoVisible] = useState(false);
   const [isModalResponsavelVisible, setIsModalResponsavelVisible] = useState(false);
   const [observacoes, setObservacoes] = useState<Observacao[]>([]);
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
   const [form] = Form.useForm();
 
+  useEffect(() => {
+    if (studentIdStr) {
+      dispatch(fetchStudentById(studentIdStr))
+    }
+  }, [dispatch, studentIdStr]);
   // Colunas para Observações sobre o Aluno
+
   const columnsObservacoes = [
     {
       title: 'Título',
@@ -118,6 +134,19 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
       });
   };
 
+  if (loading)
+    return (
+      <div className='flex h-full items-center justify-center'>
+        <Spin size='large' />
+      </div>
+    )
+  if (!student)
+    return (
+      <div className='flex h-full items-center justify-center'>
+        Estudante não encontrado
+      </div>
+    )
+
   return (
   <div className="flex items-center justify-center min-h-screen">
   <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
@@ -126,9 +155,12 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
   </div>
     <Form layout="vertical" className="space-y-6">
             {/* Dados do Aluno */}
+            
            <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
             <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula do Aluno</h2>
             <div className="md:col-span-2 space-y-6">
+            {student.name && (<h1 className="text-lg font-semibold">Aluno: {student.name}</h1>)}
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Form.Item label="Data de Nascimento" name="dataNascimento">
                   <InputMask mask="99/99/9999">
