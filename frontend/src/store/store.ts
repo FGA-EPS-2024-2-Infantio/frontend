@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import counterSlice from './slices/counterSlice'
 import schoolSlice from './slices/schoolSlice'
+import studentSlice from './slices/studentSlice'
 
 export const store = configureStore({
   reducer: {
     counter: counterSlice,
     school: schoolSlice,
+    student: studentSlice
   }
 })
 

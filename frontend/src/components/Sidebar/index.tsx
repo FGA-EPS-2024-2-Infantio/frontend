@@ -1,11 +1,11 @@
 'use client'
 
 import { HomeOutlined, UserOutlined } from '@ant-design/icons'
+import { useUser } from '@auth0/nextjs-auth0/client'
 import type { MenuProps } from 'antd'
 import { Layout, Menu } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { useUser } from '@auth0/nextjs-auth0/client'
 
 const { Sider } = Layout
 

@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: node:1
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules  
+    environment:
+      - NODE_ENV=development  
+    env_file:
+      - .env  
+    ports:
+      - '3000:3000' 
+    command: sh -c "yarn install && yarn dev"
+
+  sonarqube:
+    image: sonarqube:lts-community
+    depends_on:
+      - sonar_db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonar_db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    ports:
+      - "9001:9000" 
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_temp:/opt/sonarqube/temp
+
+  sonar_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - sonar_db:/var/lib/postgresql
+      - sonar_db_data:/var/lib/postgresql/data
+
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_temp:
+  sonar_db:
+  sonar_db_data:
+
+
+
+## No linux, caso tenha problema com vm.max_map_count, digitar o comando "sudo sysctl -w vm.max_map_count=262144"
+
+#modelo sonar-scanner
+# sonar-scanner \
+#   -Dsonar.projectKey=front \
+#   -Dsonar.sources=. \
+#   -Dsonar.host.url=http://localhost:9001 \
+#   -Dsonar.login=sqp_259f99f1f62e36f90b423f04673e25c8facf25be
