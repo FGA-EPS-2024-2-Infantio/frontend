@@ -24,8 +24,10 @@ function getItem(
   } as MenuItem
 }
 
-const items: MenuItem[] = [getItem('Escolas', '1', <HomeOutlined />),
-  getItem('Alunos','2', <UserOutlined />)
+const items: MenuItem[] = [
+  getItem('Escolas', '1', <HomeOutlined />),
+  getItem('Alunos', '2', <UserOutlined />),
+  getItem('Professores', '3', <UserOutlined />)
 ]
 
 export default function Sidebar() {
@@ -39,6 +41,9 @@ export default function Sidebar() {
       router.push('/escolas')
     } else if (e.key === '2') {
       router.push('/alunos')
+    }
+    if (e.key === '3') {
+      router.push('/professores')
     }
   }
 
