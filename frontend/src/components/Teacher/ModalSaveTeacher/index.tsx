@@ -14,8 +14,6 @@ import localeData from 'dayjs/plugin/localeData'
 import weekday from 'dayjs/plugin/weekday'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import weekYear from 'dayjs/plugin/weekYear'
-import { useRouter } from 'next/navigation'
-import { now } from 'moment'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(advancedFormat)
@@ -38,8 +36,6 @@ export default function ModalSaveTeacher({
   const [form] = Form.useForm<CreateTeacherType>()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.teacher)
-
-  const router = useRouter();
 
   form.setFieldValue("startDate", dayjs(form.getFieldValue("startDate")))
 

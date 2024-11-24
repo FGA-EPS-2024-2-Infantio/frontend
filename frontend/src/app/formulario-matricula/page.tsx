@@ -41,6 +41,7 @@ export default function FormularioMatricula() {
       title: 'Ações',
       key: 'actions',
       align: 'right' as const,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: (_: any, record: Observacao) => (
         <Button
           type="text"
@@ -72,6 +73,7 @@ export default function FormularioMatricula() {
       title: 'Ações',
       key: 'actions',
       align: 'right' as const,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: (_: any, record: Responsavel) => (
         <Button
           type="text"
@@ -108,6 +110,7 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
   };
 
   // Envio do formulário
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = () => {
     form.validateFields(['aceiteResponsabilidade', 'autorizacaoImagens'])
       .then(() => {

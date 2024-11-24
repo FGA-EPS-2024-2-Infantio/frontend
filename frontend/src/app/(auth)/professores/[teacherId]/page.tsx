@@ -40,7 +40,7 @@ export default function TeacherDetails() {
         router.push('/professores')
       })
       .catch(error => toast.error(`Erro: ${error.message}`))
-  }, [dispatch, teacherIdStr])
+  }, [dispatch, teacherIdStr, router])
 
   const actionMenuItems = useMemo(() => {
     const items = []
