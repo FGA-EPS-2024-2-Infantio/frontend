@@ -1,6 +1,6 @@
 'use client'
 
-import { HomeOutlined, UserOutlined } from '@ant-design/icons'
+import { BookOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Layout, Menu } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -27,7 +27,8 @@ function getItem(
 const items: MenuItem[] = [
   getItem('Escolas', '1', <HomeOutlined />),
   getItem('Alunos', '2', <UserOutlined />),
-  getItem('Professores', '3', <UserOutlined />)
+  getItem('Professores', '3', <UserOutlined />),
+  getItem('Turmas', '4', <BookOutlined />),
 ]
 
 export default function Sidebar() {
@@ -44,6 +45,9 @@ export default function Sidebar() {
     }
     if (e.key === '3') {
       router.push('/professores')
+    }
+    if (e.key === '4') {
+      router.push('/turmas')
     }
   }
 

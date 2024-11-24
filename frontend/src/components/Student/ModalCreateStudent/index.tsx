@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 type Props = {
   isModalOpen: boolean
   setIsModalOpen: (state: boolean) => void
-  studentToEdit: StudentsResponseDTO
+  studentToEdit?: StudentsResponseDTO
 }
 
 const optsPeriod = [
