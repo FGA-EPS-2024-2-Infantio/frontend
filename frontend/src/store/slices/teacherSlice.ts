@@ -55,19 +55,19 @@ export const fetchTeacherById = createAsyncThunk(
   }
 )
 
-export const deleteTeacherById = createAsyncThunk(
-  'teachers/deleteTeacherById',
-  async (id: string, { rejectWithValue }) => {
-    try {
-      await axiosInstance.delete(`/teachers/${id}`)
-      return id
-    } catch (error) {
-      return rejectWithValue(
-        getAxiosErrorMessage(error, 'Erro ao desativar professor')
-      )
-    }
-  }
-)
+// export const deleteTeacherById = createAsyncThunk(
+//   'teachers/deleteTeacherById',
+//   async (id: string, { rejectWithValue }) => {
+//     try {
+//       await axiosInstance.delete(`/teachers/${id}`)
+//       return id
+//     } catch (error) {
+//       return rejectWithValue(
+//         getAxiosErrorMessage(error, 'Erro ao desativar professor')
+//       )
+//     }
+//   }
+// )
 
 export const createTeacher = createAsyncThunk(
   'teachers/createTeacher',
@@ -143,19 +143,19 @@ const teacherSlice = createSlice({
         setLoadingAndError(state, false, action.payload as string)
       })
 
-      // Delete Teacher
-      .addCase(deleteTeacherById.pending, state =>
-        setLoadingAndError(state, true)
-      )
-      .addCase(deleteTeacherById.fulfilled, (state, action) => {
-        setLoadingAndError(state, false)
-        state.teachers = state.teachers.filter(
-          teacher => teacher.id !== action.payload
-        )
-      })
-      .addCase(deleteTeacherById.rejected, (state, action) => {
-        setLoadingAndError(state, false, action.payload as string)
-      })
+      // // Delete Teacher
+      // .addCase(deleteTeacherById.pending, state =>
+      //   setLoadingAndError(state, true)
+      // )
+      // .addCase(deleteTeacherById.fulfilled, (state, action) => {
+      //   setLoadingAndError(state, false)
+      //   state.teachers = state.teachers.filter(
+      //     teacher => teacher.id !== action.payload
+      //   )
+      // })
+      // .addCase(deleteTeacherById.rejected, (state, action) => {
+      //   setLoadingAndError(state, false, action.payload as string)
+      // })
 
       // Update Teacher
       .addCase(updateTeacher.pending, state => setLoadingAndError(state, true))

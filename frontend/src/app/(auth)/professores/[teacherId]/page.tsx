@@ -1,18 +1,16 @@
 'use client'
 import ModalSaveTeacher from '@/components/Teacher/ModalSaveTeacher'
-import { deleteTeacherById, fetchTeacherById } from '@/store/slices/teacherSlice'
+import { fetchTeacherById } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
-import { Button, Dropdown, Popconfirm, Spin } from 'antd'
+import { Button, Dropdown, Spin } from 'antd'
 import { useParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation'
 
 export default function TeacherDetails() {
   const { teacherId } = useParams() 
-  const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error, teacher } = useSelector(
     (state: RootState) => state.teacher
@@ -32,15 +30,15 @@ export default function TeacherDetails() {
     }
   }, [error])
 
-  const handleDeleteTeacher = useCallback(() => {
-    dispatch(deleteTeacherById(teacherIdStr))
-      .unwrap()
-      .then(() => {
-        toast.success('Professor deletado com sucesso')
-        router.push('/professores')
-      })
-      .catch(error => toast.error(`Erro: ${error.message}`))
-  }, [dispatch, teacherIdStr, router])
+  // const handleDeleteTeacher = useCallback(() => {
+  //   dispatch(deleteTeacherById(teacherIdStr))
+  //     .unwrap()
+  //     .then(() => {
+  //       toast.success('Professor deletado com sucesso')
+  //       router.push('/professores')
+  //     })
+  //     .catch(error => toast.error(`Erro: ${error.message}`))
+  // }, [dispatch, teacherIdStr, router])
 
   const actionMenuItems = useMemo(() => {
     const items = []
@@ -50,23 +48,23 @@ export default function TeacherDetails() {
       label: <span onClick={() => setIsModalOpen(true)}>Editar professor</span>
     })
 
-    items.push({
-      key: 'deleteTeacher',
-      label: (
-        <Popconfirm
-          title='Tem certeza que deseja deletar este professor?'
-          onConfirm={handleDeleteTeacher}
-          okText='Sim'
-          cancelText='Não'
-          placement='bottom'
-        >
-          <span>Deletar professor</span>
-        </Popconfirm>
-      )
-    })
+    // items.push({
+    //   key: 'deleteTeacher',
+    //   label: (
+    //     <Popconfirm
+    //       title='Tem certeza que deseja deletar este professor?'
+    //       onConfirm={handleDeleteTeacher}
+    //       okText='Sim'
+    //       cancelText='Não'
+    //       placement='bottom'
+    //     >
+    //       <span>Deletar professor</span>
+    //     </Popconfirm>
+    //   )
+    // })
 
     return items
-  }, [handleDeleteTeacher])
+  }, [])
 
   if (loading)
     return (
