@@ -92,7 +92,7 @@ export default function StudentDetails() {
         Estudante não encontrado
       </div>
     )
-
+    console.log(student);
   return (
     <div className='mx-6 space-y-4 rounded-lg bg-white p-6 shadow-lg'>
       <div className='mb-4 flex items-center justify-between'>
@@ -129,4 +129,5 @@ export default function StudentDetails() {
       />
     </div>
   )
+  
 }
