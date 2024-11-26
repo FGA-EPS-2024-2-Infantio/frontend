@@ -158,8 +158,6 @@ export default function FormularioMatricula() {
             cpf: updatedData.cpfPai,
             naturalidade: updatedData.naturalidadePai,
           },
-          observacoes: {
-          },
           observacoesMedicas:{
             hospital: updatedData.hospital,
             telefoneHospital: updatedData.telefoneHospital,
@@ -171,7 +169,16 @@ export default function FormularioMatricula() {
             medicamentosFebre: updatedData.medicamentosFebre,
             medicamentosVomito: updatedData.medicamentosVomito,
             observacoesGerais: updatedData.observacoesGerais
-          }
+          },
+          responsaveis: responsaveis.map((resp) => ({
+            nome: resp.nome,
+            parentesco: resp.parentesco,
+            telefone: resp.telefone,
+          })),
+          observacoes: observacoes.map((obs) => ({
+            titulo: obs.titulo,
+            descricao: obs.descricao
+          }))
         };
   
         // Aqui você pode enviar o objeto JSON para o Redux ou para a API
@@ -208,19 +215,19 @@ export default function FormularioMatricula() {
             {student.name && (<h2 className="text-2xl font-semibold mb-6">{student.name}</h2>)}
             <div className="md:col-span-2 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Form.Item label="Data de Nascimento" name="dataNascimento" initialValue={student.dataNascimento}>
+                <Form.Item label="Data de Nascimento" name="dataNascimento">
                   <InputMask mask="99/99/9999">
                     {(inputProps) => <Input {...inputProps} placeholder="DD/MM/AAAA" />}
                   </InputMask>
                 </Form.Item>
-                <Form.Item label="Naturalidade" name="naturalidadeAluno" initialValue={student.naturalidadeAluno}>
+                <Form.Item label="Naturalidade" name="naturalidadeAluno">
                   <Input placeholder="Naturalidade" />
                 </Form.Item>
               </div>
-              <Form.Item label="Endereço" name="endereco" initialValue={student.endereco}>
+              <Form.Item label="Endereço" name="endereco">
                 <Input placeholder="Endereço completo" />
               </Form.Item>
-              <Form.Item label="CEP" name="cep" initialValue={student.cep}>
+              <Form.Item label="CEP" name="cep">
                 <InputMask mask="99999-999">
                   {(inputProps) => <Input {...inputProps} placeholder="CEP" />}
                 </InputMask>
@@ -232,23 +239,23 @@ export default function FormularioMatricula() {
           <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
             <h2 className="text-lg font-semibold">Dados da Mãe</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Form.Item label="Nome" name="nomeMae" initialValue={student.nomeMae}>
+              <Form.Item label="Nome" name="nomeMae" >
                 <Input placeholder="Nome da mãe" />
               </Form.Item>
-              <Form.Item label="Telefone" name="telefoneMae" initialValue={student.telefoneMae}>
+              <Form.Item label="Telefone" name="telefoneMae">
                 <InputMask mask="(99) 99999-9999">
                   {(inputProps) => <Input {...inputProps} placeholder="Telefone" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="RG" name="rgMae" initialValue={student.rgMae}>
+              <Form.Item label="RG" name="rgMae">
                 <Input placeholder="RG" />
               </Form.Item>
-              <Form.Item label="CPF" name="cpfMae" initialValue={student.cpfMae}>
+              <Form.Item label="CPF" name="cpfMae">
                 <InputMask mask="999.999.999-99">
                   {(inputProps) => <Input {...inputProps} placeholder="CPF" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="Naturalidade" name="naturalidadeMae" initialValue={student.naturalidadeMae}>
+              <Form.Item label="Naturalidade" name="naturalidadeMae">
                 <Input placeholder="Naturalidade" />
               </Form.Item>
             </div>
@@ -258,23 +265,23 @@ export default function FormularioMatricula() {
           <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
             <h2 className="text-lg font-semibold">Dados do Pai</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Form.Item label="Nome" name="nomePai" initialValue={student.nomePai}>
+              <Form.Item label="Nome" name="nomePai">
                 <Input placeholder="Nome do pai" />
               </Form.Item>
-              <Form.Item label="Telefone" name="telefonePai" initialValue={student.telefonePai}>
+              <Form.Item label="Telefone" name="telefonePai">
                 <InputMask mask="(99) 99999-9999">
                   {(inputProps) => <Input {...inputProps} placeholder="Telefone" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="RG" name="rgPai" initialValue={student.rgPai}>
+              <Form.Item label="RG" name="rgPai">
                 <Input placeholder="RG" />
               </Form.Item>
-              <Form.Item label="CPF" name="cpfPai" initialValue={student.cpfPai}>
+              <Form.Item label="CPF" name="cpfPai">
                 <InputMask mask="999.999.999-99">
                   {(inputProps) => <Input {...inputProps} placeholder="CPF" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="Naturalidade" name="naturalidadePai" initialValue={student.naturalidadePai}>
+              <Form.Item label="Naturalidade" name="naturalidadePai">
                 <Input placeholder="Naturalidade" />
               </Form.Item>
             </div>
