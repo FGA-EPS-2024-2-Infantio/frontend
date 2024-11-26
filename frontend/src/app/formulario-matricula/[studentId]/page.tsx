@@ -1,7 +1,7 @@
 'use client'
 import { updateStudent, fetchStudentById } from '@/store/slices/studentSlice';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Radio, Table } from 'antd';
+import { Button, Checkbox, Form, Input, Radio, Table, Spin } from 'antd';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import InputMask from 'react-input-mask';
@@ -10,7 +10,6 @@ import ModalResponsavel from '../../../components/Matricula/ModalResponsavel';
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store/store'
-import {Spin } from 'antd'
 
 // Tipo para observações
 type Observacao = {
@@ -29,7 +28,7 @@ type Responsavel = {
 
 export default function FormularioMatricula() {
   const { studentId } = useParams();
-  const studentIdStr = Array.isArray(studentId) ? studentId[0] :studentId;
+  const studentIdStr = Array.isArray(studentId) ? studentId[0] : studentId;
   const dispatch = useDispatch<AppDispatch>()
   const { loading, student } = useSelector(
     (state: RootState) => state.student
@@ -45,8 +44,8 @@ export default function FormularioMatricula() {
       dispatch(fetchStudentById(studentIdStr))
     }
   }, [dispatch, studentIdStr]);
-  // Colunas para Observações sobre o Aluno
 
+  // Colunas para Observações sobre o Aluno
   const columnsObservacoes = [
     {
       title: 'Título',
@@ -97,13 +96,15 @@ export default function FormularioMatricula() {
       ),
     },
   ];
-// Adicionar uma nova observação
-const handleAddObservacao = (titulo: string, descricao: string) => {
-  setObservacoes((prev) => [
-    ...prev,
-    { key: `${prev.length + 1}`, titulo, descricao },
-  ]);
-};
+
+  // Adicionar uma nova observação
+  const handleAddObservacao = (titulo: string, descricao: string) => {
+    setObservacoes((prev) => [
+      ...prev,
+      { key: `${prev.length + 1}`, titulo, descricao },
+    ]);
+  };
+
   // Remover uma observação
   const handleDeleteObservacao = (key: string) => {
     setObservacoes((prev) => prev.filter((item) => item.key !== key));
@@ -116,18 +117,22 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
       { key: `${prev.length + 1}`, nome, parentesco, telefone: telefoneFormatado },
     ]);
   };
-  
 
   // Remover um responsável
   const handleDeleteResponsavel = (key: string) => {
     setResponsaveis((prev) => prev.filter((item) => item.key !== key));
   };
 
+  
+
   // Envio do formulário
   const handleSubmit = () => {
     form.validateFields(['aceiteResponsabilidade', 'autorizacaoImagens'])
       .then(() => {
         console.log('Termos aceitos! Dados enviados.');
+        // Atualizar os dados do aluno aqui
+        const updatedData = form.getFieldsValue();
+        dispatch(updateStudent({ id: studentIdStr, data: updatedData }));
       })
       .catch(() => {
         console.error('Por favor, aceite os termos obrigatórios.');
@@ -148,34 +153,31 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
     )
 
   return (
-  <div className="flex items-center justify-center min-h-screen">
-  <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
-  <div className="flex justify-center mb-6">
-    <Image src="/img/logo.svg" alt="Logo" width={80} height={80}/>
-  </div>
-    <Form layout="vertical" className="space-y-6">
-            {/* Dados do Aluno */}
-            
-           <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+        <div className="flex justify-center mb-6">
+          <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
+        </div>
+        <Form layout="vertical" form={form} className="space-y-6" onFinish={handleSubmit}>
+          {/* Dados do Aluno */}
+          <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
             <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula</h2>
             {student.name && (<h2 className="text-2xl font-semibold mb-6">{student.name}</h2>)}
             <div className="md:col-span-2 space-y-6">
-            
-              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Form.Item label="Data de Nascimento" name="dataNascimento">
+                <Form.Item label="Data de Nascimento" name="dataNascimento" initialValue={student.dataNascimento}>
                   <InputMask mask="99/99/9999">
                     {(inputProps) => <Input {...inputProps} placeholder="DD/MM/AAAA" />}
                   </InputMask>
                 </Form.Item>
-                <Form.Item label="Naturalidade" name="naturalidadeAluno">
+                <Form.Item label="Naturalidade" name="naturalidadeAluno" initialValue={student.naturalidadeAluno}>
                   <Input placeholder="Naturalidade" />
                 </Form.Item>
               </div>
-              <Form.Item label="Endereço" name="endereco">
+              <Form.Item label="Endereço" name="endereco" initialValue={student.endereco}>
                 <Input placeholder="Endereço completo" />
               </Form.Item>
-              <Form.Item label="CEP" name="cep">
+              <Form.Item label="CEP" name="cep" initialValue={student.cep}>
                 <InputMask mask="99999-999">
                   {(inputProps) => <Input {...inputProps} placeholder="CEP" />}
                 </InputMask>
@@ -187,23 +189,23 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
           <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
             <h2 className="text-lg font-semibold">Dados da Mãe</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Form.Item label="Nome" name="nomeMae">
+              <Form.Item label="Nome" name="nomeMae" initialValue={student.nomeMae}>
                 <Input placeholder="Nome da mãe" />
               </Form.Item>
-              <Form.Item label="Telefone" name="telefoneMae">
+              <Form.Item label="Telefone" name="telefoneMae" initialValue={student.telefoneMae}>
                 <InputMask mask="(99) 99999-9999">
                   {(inputProps) => <Input {...inputProps} placeholder="Telefone" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="RG" name="rgMae">
+              <Form.Item label="RG" name="rgMae" initialValue={student.rgMae}>
                 <Input placeholder="RG" />
               </Form.Item>
-              <Form.Item label="CPF" name="cpfMae">
+              <Form.Item label="CPF" name="cpfMae" initialValue={student.cpfMae}>
                 <InputMask mask="999.999.999-99">
                   {(inputProps) => <Input {...inputProps} placeholder="CPF" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="Naturalidade" name="naturalidadeMae">
+              <Form.Item label="Naturalidade" name="naturalidadeMae" initialValue={student.naturalidadeMae}>
                 <Input placeholder="Naturalidade" />
               </Form.Item>
             </div>
@@ -213,23 +215,23 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
           <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
             <h2 className="text-lg font-semibold">Dados do Pai</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Form.Item label="Nome" name="nomePai">
+              <Form.Item label="Nome" name="nomePai" initialValue={student.nomePai}>
                 <Input placeholder="Nome do pai" />
               </Form.Item>
-              <Form.Item label="Telefone" name="telefonePai">
+              <Form.Item label="Telefone" name="telefonePai" initialValue={student.telefonePai}>
                 <InputMask mask="(99) 99999-9999">
                   {(inputProps) => <Input {...inputProps} placeholder="Telefone" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="RG" name="rgPai">
+              <Form.Item label="RG" name="rgPai" initialValue={student.rgPai}>
                 <Input placeholder="RG" />
               </Form.Item>
-              <Form.Item label="CPF" name="cpfPai">
+              <Form.Item label="CPF" name="cpfPai" initialValue={student.cpfPai}>
                 <InputMask mask="999.999.999-99">
                   {(inputProps) => <Input {...inputProps} placeholder="CPF" />}
                 </InputMask>
               </Form.Item>
-              <Form.Item label="Naturalidade" name="naturalidadePai">
+              <Form.Item label="Naturalidade" name="naturalidadePai" initialValue={student.naturalidadePai}>
                 <Input placeholder="Naturalidade" />
               </Form.Item>
             </div>
@@ -297,38 +299,26 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
             <Table columns={columnsObservacoes} dataSource={observacoes} pagination={false} locale={{ emptyText: '' }} />
           </div>
 
-          {/* Termos de Aceite */}
-          <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
-            <h2 className="text-lg font-semibold">Termos de Aceite</h2>
-            <Form.Item
-              name="aceiteResponsabilidade"
-              valuePropName="checked"
-              rules={[{ required: true, message: 'Você precisa aceitar os termos para continuar.' }]}
-            >
-              <Checkbox>
-                Assumo inteira responsabilidade pelas informações e pelo pagamento.
-              </Checkbox>
-            </Form.Item>
-            <Form.Item
-              name="autorizacaoImagens"
-              valuePropName="checked"
-              rules={[{ required: true, message: 'Você precisa autorizar para continuar.' }]}
-            >
-              <Checkbox>
-                Autorizo que fotos e filmagens que incluam meu/minha filho(a) sejam feitas e utilizadas pela equipe da escola para fins pedagógicos, para publicação no site/da escola/da turma, e para fins de divulgação nas redes sociais. Estou ciente de que as imagens serão usadas apenas para fins pedagógicos e não comerciais, resguardadas as limitações legais e jurídicas.
-              </Checkbox>
-            </Form.Item>
-          </div>
+          {/* Termos de Responsabilidade */}
+          <Form.Item name="aceiteResponsabilidade" valuePropName="checked" required>
+            <Checkbox>
+              Aceito a responsabilidade de matrícula e documentos
+            </Checkbox>
+          </Form.Item>
+          <Form.Item name="autorizacaoImagens" valuePropName="checked" required>
+            <Checkbox>
+              Autorizo a utilização da imagem para atividades escolares
+            </Checkbox>
+          </Form.Item>
 
-          {/* Botão Salvar */}
-          <div className="flex justify-center mt-4">
+          {/* Botões de Ação */}
+          <div className="flex justify-between">
             <Button type="primary" htmlType="submit">
-              Mandar Dados para Matrícula
+              Enviar Matrícula
             </Button>
           </div>
         </Form>
       </div>
-
       {/* Modal Adicionar Responsável */}
       <ModalResponsavel
         isVisible={isModalResponsavelVisible}
