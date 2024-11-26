@@ -26,6 +26,8 @@ type Responsavel = {
   telefone: string;
 };
 
+
+
 export default function FormularioMatricula() {
   const { studentId } = useParams();
   const studentIdStr = Array.isArray(studentId) ? studentId[0] : studentId;
@@ -124,6 +126,7 @@ export default function FormularioMatricula() {
   };
 
   
+  
 
   // Envio do formulário
   const handleSubmit = () => {
@@ -132,7 +135,47 @@ export default function FormularioMatricula() {
         console.log('Termos aceitos! Dados enviados.');
         // Atualizar os dados do aluno aqui
         const updatedData = form.getFieldsValue();
-        dispatch(updateStudent({ id: studentIdStr, data: updatedData }));
+        const studentData = {
+          name: student.name,
+          categorie: student.categorie,
+          class:student.class,
+          turn:student.turn,
+          dataNascimento: "1990-01-01T00:00:00Z",
+          naturalidadeAluno: updatedData.naturalidadeAluno,
+          cep:updatedData.cep,
+          endereco:updatedData.endereco,
+          mae: {
+            nome: updatedData.nomeMae,
+            telefone: updatedData.telefoneMae,
+            rg: updatedData.rgMae,
+            cpf: updatedData.cpfMae,
+            naturalidade: updatedData.naturalidadeMae,
+          },
+          pai: {
+            nome: updatedData.nomePai,
+            telefone: updatedData.telefonePai,
+            rg: updatedData.rgPai,
+            cpf: updatedData.cpfPai,
+            naturalidade: updatedData.naturalidadePai,
+          },
+          observacoes: {
+          },
+          observacoesMedicas:{
+            hospital: updatedData.hospital,
+            telefoneHospital: updatedData.telefoneHospital,
+            medico: updatedData.medico,
+            telefoneMedico: updatedData.telefoneMedico,
+            enderecoHospital: updatedData.enderecoHospital,
+            possuiConvenio: updatedData.possuiConvenio,
+            alergias: updatedData.alergias,
+            medicamentosFebre: updatedData.medicamentosFebre,
+            medicamentosVomito: updatedData.medicamentosVomito,
+            observacoesGerais: updatedData.observacoesGerais
+          }
+        };
+  
+        // Aqui você pode enviar o objeto JSON para o Redux ou para a API
+        dispatch(updateStudent({ id: studentIdStr, data: studentData }));
       })
       .catch(() => {
         console.error('Por favor, aceite os termos obrigatórios.');
