@@ -1,17 +1,22 @@
-'use client'
-
-import Sidebar from '@/components/Sidebar'
+import Sidebar from '@/components/Sidebar';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '../api/auth/[...nextauth]/route';
 
 type Props = {
   children: React.ReactNode
 }
 
-export default function AuthLayout({ children }: Props) {
-  // TODO: autenticação
+export default async function AuthLayout({ children }: Props) {
+  const session = await getServerSession(authOptions);
+
+  if(!session){
+    redirect('/api/auth/signin');
+  }
 
   return (
     <div className='flex'>
-      <Sidebar />
+      <Sidebar session={session}/>
       <div className='flex-1 p-6'>{children}</div>
     </div>
   )
