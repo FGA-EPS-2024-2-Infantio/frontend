@@ -137,10 +137,11 @@ export default function FormularioMatricula() {
         const updatedData = form.getFieldsValue();
         const studentData = {
           name: student.name,
+          isFilled: true,
           categorie: student.categorie,
           class:student.class,
           turn:student.turn,
-          dataNascimento: "1990-01-01T00:00:00Z",
+          dataNascimento: updatedData.dataNascimento,
           naturalidadeAluno: updatedData.naturalidadeAluno,
           cep:updatedData.cep,
           endereco:updatedData.endereco,
@@ -201,6 +202,13 @@ export default function FormularioMatricula() {
         Estudante não encontrado
       </div>
     )
+
+    if (student.isFilled)
+      return (
+        <div className='flex h-full items-center justify-center'>
+          Formulário já preenchido!
+        </div>
+      )
 
   return (
     <div className="flex items-center justify-center min-h-screen">

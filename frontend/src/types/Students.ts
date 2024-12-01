@@ -1,9 +1,10 @@
 export type StudentDTO = {
     name: string;
+    isFilled?: boolean;
     categorie: CategorieType;
     class: ClassType;
     turn: TurnType;
-    dataNascimento?: Date;
+    dataNascimento?: string;
     naturalidadeAluno?: string;
     endereco?: string;
     cep?: string;
@@ -48,6 +49,7 @@ export type ObservacoesMedicasDto  = {
 export type StudentsResponseDTO = {
     id: string;
     name: string;
+    isFilled?: boolean;
     categorie: CategorieType;
     class: ClassType;
     turn: TurnType;
