@@ -3,9 +3,16 @@ import { CreateTeacherType, TeacherResponseDto } from '@/types/Teachers'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+
+type School = {
+  id: number
+  name: string
+}
+
 interface TeacherState {
   loading: boolean
   error: string | null
+  schools: School[]
   teachers: TeacherResponseDto[]
   teacher: TeacherResponseDto | null
 }
@@ -13,9 +20,19 @@ interface TeacherState {
 const initialState: TeacherState = {
   loading: false,
   error: null,
+  schools: [],
   teachers: [],
   teacher: null
 }
+
+
+export const fetchSchools = createAsyncThunk(
+  'teacher/fetchSchools',
+  async () => {
+    const response = await axiosInstance.get('/schools')
+    return response.data
+  }
+)
 
 const setLoadingAndError = (
   state: TeacherState,
@@ -176,6 +193,19 @@ const teacherSlice = createSlice({
       })
       .addCase(updateTeacher.rejected, (state, action) => {
         setLoadingAndError(state, false, action.payload as string)
+      })
+      //Fetch Schools
+      .addCase(fetchSchools.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(fetchSchools.fulfilled, (state, action) => {
+        console.log('Escolas recebidas:', action.payload);
+        state.schools = action.payload;
+      })
+      
+      .addCase(fetchSchools.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || 'Erro ao buscar escolas'
       })
   }
 })
