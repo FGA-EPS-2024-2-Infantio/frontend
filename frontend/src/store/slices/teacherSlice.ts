@@ -199,7 +199,6 @@ const teacherSlice = createSlice({
         state.loading = true
       })
       .addCase(fetchSchools.fulfilled, (state, action) => {
-        console.log('Escolas recebidas:', action.payload);
         state.schools = action.payload;
       })
       
