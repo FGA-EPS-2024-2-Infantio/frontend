@@ -61,7 +61,8 @@ export default function Teachers() {
     numberOfClasses: teacher.numberOfClasses,
     cpf:teacher.cpf,
     startDate: teacher.startDate,
-    createdAt: teacher.createdAt
+    createdAt: teacher.createdAt,
+    disabled: teacher.disabled
   }))
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -85,9 +86,10 @@ export default function Teachers() {
         onRow={record => ({
           onClick: () => handleRowClick(record)
         })}
-        rowClassName={({  }) =>
+        rowClassName={({  disabled}) =>
           classNames(
             'cursor-pointer hover:bg-gray-100 transition duration-200',
+            {'bg-red-100 hover:!bg-red-200': disabled}
           )
         }
         rowHoverable={false}
