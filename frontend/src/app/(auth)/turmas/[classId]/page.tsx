@@ -1,5 +1,6 @@
 'use client'
 import ModalSaveClass from '@/components/Class/ModalSaveClass'
+import { fetchAttendances } from '@/store/slices/attendanceSlice'
 import {
   deleteClassById,
   fetchClassById,
@@ -9,7 +10,7 @@ import { fetchStudents } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Select, Spin } from 'antd'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -28,9 +29,24 @@ export default function ClassDetails() {
     (state: RootState) => state.student
   )
 
+  const {attendances, error: todoMundoErra} = useSelector((state: RootState) => state.attendence)
+
+  const router = useRouter()
+
+  useEffect(() => {
+    dispatch(fetchAttendances())
+  }, [dispatch])
+
   useEffect(() => {
     dispatch(fetchStudents())
   }, [dispatch])
+
+  useEffect(() => {
+    if(todoMundoErra) {
+      console.log('Todo mundo vai errar', todoMundoErra)
+      toast.error(todoMundoErra)
+    }
+  })
 
   useEffect(() => {
     if (errorStudents) {
@@ -56,6 +72,8 @@ export default function ClassDetails() {
       setSelectedStudents(classObj.students.map(student => student.id))
     }
   }, [classObj])
+
+
 
   const handleUpdateStudents = () => {
     dispatch(
@@ -148,10 +166,13 @@ export default function ClassDetails() {
           >
             {classObj.disabled ? 'Desabilitada' : 'Habilitada'}
           </span>
-          <p className='text-lg text-gray-700'>
+          <p className='text-lg flex-1 text-gray-700'>
             Professor:{' '}
             <span className='font-medium'>{classObj.teacher.name}</span>
           </p>
+        <Button type='primary' size='large' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
+          Chamada
+        </Button  >
         </div>
       </div>
 
@@ -200,6 +221,27 @@ export default function ClassDetails() {
         >
           Atualizar alunos
         </Button>
+      </div>
+
+      {/*Lista de chamadas */}
+      <div className='space-y-4'>
+        <h3 className='text-lg font-semibold text-gray-800'>Chamadas:</h3>
+        {attendances.length > 0 ? (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3'>
+            {attendances.map(attendance => (
+              <div
+                key={attendance.id}
+                className='flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm hover:shadow-md'
+              >
+                <div className='flex-1'>
+                  <p className='font-medium text-gray-900'>{`${new Date(attendance.date).toLocaleDateString("pt")}`}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className='text-gray-500'>Nenhum chamada cadastrada.</p>
+        )}
       </div>
 
       {/* Modal */}
