@@ -55,6 +55,20 @@ export const fetchAttendanceById = createAsyncThunk(
   }
 )
 
+export const fetchAttendanceByDate = createAsyncThunk(
+  'attendances/fetchAttendanceByDate',
+  async (date: Date, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/attendances/date/${date}`)
+      return response.data
+    } catch (error) {
+      return rejectWithValue(
+        getAxiosErrorMessage(error, 'Erro ao buscar chamada')
+      )
+    }
+  }
+)
+
 export const createAttendance = createAsyncThunk(
   'attendances/createAttendance',
   async (attendanceData: CreateAttendanceType[], { rejectWithValue }) => {

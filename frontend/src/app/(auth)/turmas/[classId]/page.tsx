@@ -8,6 +8,7 @@ import {
 } from '@/store/slices/classSlice'
 import { fetchStudents } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
+import { AttendanceResponseDto, CreateAttendanceType } from '@/types/Attendances'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Select, Spin } from 'antd'
 import { useParams, useRouter } from 'next/navigation'
@@ -30,6 +31,19 @@ export default function ClassDetails() {
   )
 
   const {attendances, error: todoMundoErra} = useSelector((state: RootState) => state.attendence)
+  const uniqueDates = new Set<string>();
+    const filteredAttendances: AttendanceResponseDto[] = [];
+
+  attendances.forEach(attendance => {
+  const formattedDate = new Date(attendance.date).toDateString().split("T")[0];
+  
+  if (!uniqueDates.has(formattedDate)) {
+    uniqueDates.add(formattedDate);
+    filteredAttendances.push(attendance);
+  }
+});
+
+  console.log(filteredAttendances);
 
   const router = useRouter()
 
@@ -127,6 +141,11 @@ export default function ClassDetails() {
 
     return items
   }, [handleDeactivateClass, classObj?.disabled])
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    console.log(event.currentTarget.id)
+    router.push(`${classId}/chamada/${event.currentTarget.id}`)
+  }
 
   if (loading)
     return (
@@ -226,12 +245,14 @@ export default function ClassDetails() {
       {/*Lista de chamadas */}
       <div className='space-y-4'>
         <h3 className='text-lg font-semibold text-gray-800'>Chamadas:</h3>
-        {attendances.length > 0 ? (
+        {filteredAttendances.length > 0 ? (
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3'>
-            {attendances.map(attendance => (
+            {filteredAttendances.map(attendance => (
               <div
+                onClick={handleClick}
                 key={attendance.id}
-                className='flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm hover:shadow-md'
+                id={attendance.id}
+                className='flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm hover:shadow-md hover:cursor-pointer'
               >
                 <div className='flex-1'>
                   <p className='font-medium text-gray-900'>{`${new Date(attendance.date).toLocaleDateString("pt")}`}</p>
