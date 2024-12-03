@@ -1,6 +1,6 @@
 "use client"
 
-import { createAttendance, fetchAttendanceByDate, fetchAttendanceById } from "@/store/slices/attendanceSlice";
+import { createAttendance, fetchAttendanceByDate, fetchAttendanceById, updateAttendance } from "@/store/slices/attendanceSlice";
 import { fetchStudents } from "@/store/slices/studentSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
@@ -35,7 +35,11 @@ const Page = () => {
       useEffect(() => {
         dispatch(fetchAttendanceByDate(attendances.find(attendance => attendance.id === attendanceIdStr)?.date || new Date()))
       }, [dispatch])
-
+      
+      useEffect(() => {
+        studentList.forEach((student) => student.hasAttended = attendances.find(attendance => attendance.studentId === student.studentId)?.hasAttended as boolean)
+      }, [studentList])
+      
       const handleChange = (event: CheckboxChangeEvent) => {
         const isChecked = event.target.checked;
         const studentIndex = studentList.findIndex(student => student.studentId === event.target.id);
@@ -80,7 +84,11 @@ const Page = () => {
       
       const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         console.log('Success: ', values, studentList);
-        await dispatch(createAttendance(studentList));
+        studentList.forEach((student) => {
+          const attendanceId = attendances.find((attendance) => attendance.studentId === student.studentId)?.id
+          if(!attendanceId) return;
+          dispatch(updateAttendance({id: attendanceId, data: student}))
+        })
       };
       
       const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
