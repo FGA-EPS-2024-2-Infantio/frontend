@@ -8,13 +8,15 @@ interface AttendanceState {
   error: string | null
   attendances: AttendanceResponseDto[]
   attendance: AttendanceResponseDto | null
+  attendancesByDate: AttendanceResponseDto[]
 }
 
 const initialState: AttendanceState = {
   loading: false,
   error: null,
   attendances: [],
-  attendance: null
+  attendance: null,
+  attendancesByDate: []
 }
 
 const setLoadingAndError = (
@@ -57,7 +59,7 @@ export const fetchAttendanceById = createAsyncThunk(
 
 export const fetchAttendanceByDate = createAsyncThunk(
   'attendances/fetchAttendanceByDate',
-  async (date: Date, { rejectWithValue }) => {
+  async (date: string, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/attendances/date/${date}`)
       return response.data
@@ -163,6 +165,23 @@ const attendanceSlice = createSlice({
       .addCase(updateAttendance.rejected, (state, action) => {
         setLoadingAndError(state, false, action.payload as string)
       })
+
+      //Fetch attendance By date
+      .addCase(fetchAttendanceByDate.pending, (state) => {
+        setLoadingAndError(state, true);
+      })
+      .addCase(fetchAttendanceByDate.fulfilled, (state, action) => {
+        console.log('Payload recebido no fulfilled:', action.payload); 
+        console.log('Estado antes da atualização:', state.attendancesByDate); 
+        
+        setLoadingAndError(state, false);
+        state.attendancesByDate = action.payload; 
+        
+        console.log('Estado após a atualização:', state.attendancesByDate);
+      })
+      .addCase(fetchAttendanceByDate.rejected, (state, action) => {
+        setLoadingAndError(state, false, action.payload as string);
+      });
   }
 })
 

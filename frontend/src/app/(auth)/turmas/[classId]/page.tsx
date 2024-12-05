@@ -30,18 +30,18 @@ export default function ClassDetails() {
     (state: RootState) => state.student
   )
 
-  const {attendances, error: todoMundoErra} = useSelector((state: RootState) => state.attendence)
+  const { attendances, error: todoMundoErra } = useSelector((state: RootState) => state.attendence)
   const uniqueDates = new Set<string>();
-    const filteredAttendances: AttendanceResponseDto[] = [];
+  const filteredAttendances: AttendanceResponseDto[] = [];
 
   attendances.forEach(attendance => {
-  const formattedDate = new Date(attendance.date).toDateString().split("T")[0];
-  
-  if (!uniqueDates.has(formattedDate)) {
-    uniqueDates.add(formattedDate);
-    filteredAttendances.push(attendance);
-  }
-});
+    const formattedDate = new Date(attendance.date).toDateString().split("T")[0];
+
+    if (!uniqueDates.has(formattedDate)) {
+      uniqueDates.add(formattedDate);
+      filteredAttendances.push(attendance);
+    }
+  });
 
   console.log(filteredAttendances);
 
@@ -56,7 +56,7 @@ export default function ClassDetails() {
   }, [dispatch])
 
   useEffect(() => {
-    if(todoMundoErra) {
+    if (todoMundoErra) {
       console.log('Todo mundo vai errar', todoMundoErra)
       toast.error(todoMundoErra)
     }
@@ -143,9 +143,13 @@ export default function ClassDetails() {
   }, [handleDeactivateClass, classObj?.disabled])
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    console.log(event.currentTarget.id)
-    router.push(`${classId}/chamada/${event.currentTarget.id}`)
-  }
+    const attendanceId = event.currentTarget.id; 
+    const attendanceDate = event.currentTarget.getAttribute('data-id'); 
+    
+    if (attendanceDate && attendanceId) {
+      router.push(`${classId}/chamada/${attendanceDate}/${attendanceId}`);
+    }
+  };
 
   if (loading)
     return (
@@ -177,11 +181,10 @@ export default function ClassDetails() {
       <div className='space-y-4'>
         <div className='flex items-center gap-4'>
           <span
-            className={`rounded-full px-3 py-1 text-sm font-medium ${
-              classObj.disabled
+            className={`rounded-full px-3 py-1 text-sm font-medium ${classObj.disabled
                 ? 'bg-red-100 text-red-700'
                 : 'bg-green-100 text-green-700'
-            }`}
+              }`}
           >
             {classObj.disabled ? 'Desabilitada' : 'Habilitada'}
           </span>
@@ -189,9 +192,9 @@ export default function ClassDetails() {
             Professor:{' '}
             <span className='font-medium'>{classObj.teacher.name}</span>
           </p>
-        <Button type='primary' size='large' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
-          Chamada
-        </Button  >
+          <Button type='primary' size='large' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
+            + Criar nova chamada 
+          </Button  >
         </div>
       </div>
 
@@ -252,10 +255,13 @@ export default function ClassDetails() {
                 onClick={handleClick}
                 key={attendance.id}
                 id={attendance.id}
+                data-id={attendance.date.toString()}
                 className='flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm hover:shadow-md hover:cursor-pointer'
               >
                 <div className='flex-1'>
-                  <p className='font-medium text-gray-900'>{`${new Date(attendance.date).toLocaleDateString("pt")}`}</p>
+                  <p className="font-medium text-gray-900">
+                    {`${new Date(attendance.date).getDate().toString().padStart(2, '0')}/${(new Date(attendance.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(attendance.date).getFullYear()}`}
+                  </p>
                 </div>
               </div>
             ))}

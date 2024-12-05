@@ -9,93 +9,111 @@ import { Button, Checkbox, DatePicker, Divider, Form, FormProps, Radio, Spin, Ta
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";  
+import { useDispatch, useSelector } from "react-redux";
 
 const Page = () => {
-    const {classId} = useParams();
-    const [studentList, setStudentList] = useState<CreateAttendanceType[]>([])
-    const classIdStr = Array.isArray(classId) ? classId[0] : classId
+  const { classId } = useParams();
+  const [studentList, setStudentList] = useState<CreateAttendanceType[]>([])
+  const classIdStr = Array.isArray(classId) ? classId[0] : classId
 
-    
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-    const dispatch = useDispatch<AppDispatch>()
+  const handleDateChange = (date: Date) => {
 
-    const { loading, error, classObj } = useSelector(
-        (state: RootState) => state.class
-      )
-    
-      useEffect(() => {
-        dispatch(fetchStudents())
-        const students: CreateAttendanceType[] = []
-        classObj?.students.forEach(student => students.push({studentId: student.id, classId: classIdStr, date: new Date(), hasAttended: false}))
-        setStudentList(students)
-      }, [dispatch])
+    const selectedDate = new Date(date.valueOf());
 
-      const handleChange = (event: CheckboxChangeEvent) => {
-        const isChecked = event.target.checked;
-        const studentIndex = studentList.findIndex(student => student.studentId === event.target.id);
-        studentList[studentIndex].hasAttended = isChecked;
-      }
+    setSelectedDate(selectedDate);
+  };
 
-      type DataType = {
-        studentId: string,
-        studentName:string,
-      }
+  const dispatch = useDispatch<AppDispatch>()
 
-      const columns: TableProps<DataType>['columns'] = [
-        {
-          title: 'Nome do Aluno',
-          dataIndex: 'studentName',
-          key: 'name',
-          render: text => <strong>{text}</strong>
-        },
-        {
-            title: "Presente",
-            key: "attendance",
-            render: (_, record) => <Checkbox id={record.studentId} onChange={handleChange} />,
-        },
-      ]
+  const { loading, error, classObj } = useSelector(
+    (state: RootState) => state.class
+  )
 
-      if(!classObj) {
-        return <div className='flex h-full items-center justify-center'>
-        <Spin size='large' />
-      </div>
-      }
-    
-      const data: DataType[] = classObj?.students.map(student => ({
-        studentId: student.id,
-        studentName: student.name,
-      }))
+  useEffect(() => {
+    dispatch(fetchStudents())
+    const students: CreateAttendanceType[] = []
+    classObj?.students.forEach(student => students.push({ studentId: student.id, classId: classIdStr, date: new Date(), hasAttended: false }))
+    setStudentList(students)
+  }, [dispatch])
 
-      type FieldType = {
-        username?: string;
-        password?: string;
-        remember?: string;
-      };
-      
-      const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-        console.log('Success: ', values, studentList);
-        await dispatch(createAttendance(studentList));
-      };
-      
-      const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-      };
+  const handleChange = (event: CheckboxChangeEvent) => {
+    const isChecked = event.target.checked;
+    const studentIndex = studentList.findIndex(student => student.studentId === event.target.id);
+    studentList[studentIndex].hasAttended = isChecked;
+  }
 
-    return <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
-        <Form.Item<Date> label="Attendance date"><DatePicker></DatePicker></Form.Item>
-        
-      <Divider />
-      <Table<DataType>
-        columns={columns}
-        dataSource={data}
-      />
-      <Form.Item label={null}>
+  type DataType = {
+    studentId: string,
+    studentName: string,
+  }
+
+  const columns: TableProps<DataType>['columns'] = [
+    {
+      title: 'Nome do Aluno',
+      dataIndex: 'studentName',
+      key: 'name',
+      render: text => <strong>{text}</strong>
+    },
+    {
+      title: "Presente",
+      key: "attendance",
+      render: (_, record) => <Checkbox id={record.studentId} onChange={handleChange} />,
+    },
+  ]
+
+  if (!classObj) {
+    return <div className='flex h-full items-center justify-center'>
+      <Spin size='large' />
+    </div>
+  }
+
+  const data: DataType[] = classObj?.students.map(student => ({
+    studentId: student.id,
+    studentName: student.name,
+  }))
+
+  type FieldType = {
+    username?: string;
+    password?: string;
+    remember?: string;
+  };
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+    const updatedStudentList = studentList.map(student => ({
+      ...student,
+      date: selectedDate,
+    }));
+
+    console.log("lista", updatedStudentList)
+
+    await dispatch(createAttendance(updatedStudentList));
+  };
+
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  return <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
+    <Form.Item<Date>
+      label={<span style={{ fontWeight: 'bold', fontSize: '16px' }}>Escolha a data</span>}
+    >
+      <DatePicker onChange={handleDateChange} 
+      style={{ width: '30%', height: '40px', fontSize: '20px' }}/>
+    </Form.Item>
+
+    <Divider />
+    <Table<DataType>
+      columns={columns}
+      dataSource={data}
+    />
+    <Form.Item label={null}>
       <Button type="primary" htmlType="submit">
-        Submit
+       Salvar chamada 
       </Button>
     </Form.Item>
-    </Form>
+  </Form>
 };
 
 export default Page;

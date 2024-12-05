@@ -4,17 +4,17 @@ import { createAttendance, fetchAttendanceByDate, fetchAttendanceById, updateAtt
 import { fetchStudents } from "@/store/slices/studentSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
-import { TableProps, Checkbox, Spin, FormProps, Form, DatePicker, Divider, Table, Button } from "antd";
+import { TableProps, Checkbox, Spin, FormProps, Form, DatePicker, Divider, Table, Button, Typography } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Page = () => {
-    const {attendanceId, classId} = useParams();
+    const {classId,attendanceDate,attendanceId} = useParams();
     const [studentList, setStudentList] = useState<CreateAttendanceType[]>([])
     const classIdStr = Array.isArray(classId) ? classId[0] : classId
-    const attendanceIdStr = Array.isArray(attendanceId) ? attendanceId[0] : attendanceId
+    
 
     
 
@@ -23,7 +23,8 @@ const Page = () => {
     const { loading, error, classObj } = useSelector(
         (state: RootState) => state.class
       )
-      const {attendances, error: attendanceError} = useSelector((state: RootState) => state.attendence)
+      const attendancesByDate = useSelector((state: RootState) => state.attendence.attendancesByDate);
+      const attendancesByDateError = useSelector((state: RootState) => state.attendence.error);
 
       useEffect(() => {
         dispatch(fetchStudents())
@@ -33,12 +34,18 @@ const Page = () => {
       }, [dispatch])
     
       useEffect(() => {
-        dispatch(fetchAttendanceByDate(attendances.find(attendance => attendance.id === attendanceIdStr)?.date || new Date()))
-      }, [dispatch])
-      
-      useEffect(() => {
-        studentList.forEach((student) => student.hasAttended = attendances.find(attendance => attendance.studentId === student.studentId)?.hasAttended as boolean)
-      }, [studentList])
+
+        const decodedDate = decodeURIComponent(attendanceDate || '');
+          console.log('Fetching attendance by date:', decodedDate); 
+          dispatch(fetchAttendanceByDate(decodedDate));
+        
+      }, [dispatch]); 
+   
+
+      useEffect(()=>{
+        console.log("isso",attendancesByDate)
+
+      },[])
       
       const handleChange = (event: CheckboxChangeEvent) => {
         const isChecked = event.target.checked;
@@ -61,7 +68,7 @@ const Page = () => {
         {
             title: "Presente",
             key: "attendance",
-            render: (_, record) => <Checkbox id={record.studentId} defaultChecked={attendances.find(attendance => attendance.studentId === record.studentId)?.hasAttended as boolean} onChange={handleChange} />,
+            render: (_, record) => <Checkbox id={record.studentId} defaultChecked={attendancesByDate.find(attendance => attendance.studentId === record.studentId)?.hasAttended as boolean} onChange={handleChange} />,
         },
       ]
 
@@ -85,7 +92,8 @@ const Page = () => {
       const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         console.log('Success: ', values, studentList);
         studentList.forEach((student) => {
-          const attendanceId = attendances.find((attendance) => attendance.studentId === student.studentId)?.id
+          
+          console.log("id chamda",attendanceId);
           if(!attendanceId) return;
           dispatch(updateAttendance({id: attendanceId, data: student}))
         })
@@ -96,7 +104,9 @@ const Page = () => {
       };
 
     return <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
-        <Form.Item<Date> label="Attendance date"><DatePicker></DatePicker></Form.Item>
+       <Typography.Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>
+    Chamada do dia {new Date(decodeURIComponent(attendanceDate)).toLocaleDateString('pt-BR')}
+  </Typography.Title>
         
       <Divider />
       <Table<DataType>
@@ -105,7 +115,7 @@ const Page = () => {
       />
       <Form.Item label={null}>
       <Button type="primary" htmlType="submit">
-        Submit
+        Salvar
       </Button>
     </Form.Item>
     </Form>
