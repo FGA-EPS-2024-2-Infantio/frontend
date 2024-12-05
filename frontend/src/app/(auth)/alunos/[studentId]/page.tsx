@@ -1,5 +1,6 @@
 'use client'
 import ModalCreateStudent from '@/components/Student/ModalCreateStudent'
+import MonthlyPayment from '@/components/MonthlyPayment/index'
 import { deleteStudentById, fetchStudentById } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
@@ -126,6 +127,12 @@ export default function StudentDetails() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         studentToEdit={student}
+      />
+
+      <MonthlyPayment
+        loading={loading}
+        payments={student.payments}
+        studentId={studentIdStr}
       />
     </div>
   )
