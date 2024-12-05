@@ -1,3 +1,5 @@
+import { MonthlyPaymentResponseDto } from "./Payment";
+
 export type StudentDTO = {
     name: string;
     categorie: CategorieType;
@@ -11,6 +13,7 @@ export type StudentsResponseDTO = {
     categorie: CategorieType;
     class: ClassType;
     turn: TurnType;
+    payments: MonthlyPaymentResponseDto[];
     disabled: boolean;
 }
 
