@@ -29,6 +29,7 @@ const items: MenuItem[] = [
   getItem('Alunos', '2', <UserOutlined />),
   getItem('Professores', '3', <UserOutlined />),
   getItem('Turmas', '4', <BookOutlined />),
+  getItem('Tela do Professor', '5', <BookOutlined />),
 ]
 
 export default function Sidebar() {
@@ -48,6 +49,9 @@ export default function Sidebar() {
     }
     if (e.key === '4') {
       router.push('/turmas')
+    }
+    if (e.key === '5') {
+      router.push('/tela_professor')
     }
   }
 
