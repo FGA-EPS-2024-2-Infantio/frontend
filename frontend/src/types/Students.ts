@@ -53,7 +53,7 @@ export type StudentsResponseDTO = {
     categorie: CategorieType;
     class: ClassType;
     turn: TurnType;
-    dataNascimento?: Date;
+    dataNascimento?: string;
     naturalidadeAluno?: string;
     endereco?: string;
     cep?: string;
