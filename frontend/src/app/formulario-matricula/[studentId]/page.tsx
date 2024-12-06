@@ -10,6 +10,7 @@ import ModalResponsavel from '../../../components/Matricula/ModalResponsavel';
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store/store'
+import { toast } from 'react-toastify'
 
 // Tipo para observações
 type Observacao = {
@@ -38,6 +39,7 @@ export default function FormularioMatricula() {
   const [isModalObservacaoVisible, setIsModalObservacaoVisible] = useState(false);
   const [isModalResponsavelVisible, setIsModalResponsavelVisible] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const [isFormHidden, setIsFormHidden] = useState(false);
   const [observacoes, setObservacoes] = useState<Observacao[]>([]);
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
   const [form] = Form.useForm();
@@ -139,7 +141,7 @@ export default function FormularioMatricula() {
   const handleSubmit = () => {
     form.validateFields(['aceiteResponsabilidade', 'autorizacaoImagens'])
       .then(() => {
-        console.log('Termos aceitos! Dados enviados.');
+        
         // Atualizar os dados do aluno aqui
         const updatedData = form.getFieldsValue();
         const studentData = {
@@ -189,32 +191,54 @@ export default function FormularioMatricula() {
           }))
         };
   
-        // Aqui você pode enviar o objeto JSON para o Redux ou para a API
         dispatch(updateStudent({ id: studentIdStr, data: studentData }));
+        setIsFormHidden(true);
+        toast.success('Formulário enviado com sucesso!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+
       })
       .catch(() => {
         console.error('Por favor, aceite os termos obrigatórios.');
+        toast.error('Por favor, aceite os termos obrigatórios.')
       });
   };
 
   if (loading)
-    return (
-      <div className='flex h-full items-center justify-center'>
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+        <div className="flex justify-center mb-6">
+          <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
+        </div>
         <Spin size='large' />
-      </div>
-    )
+    </div>
+    </div>
+      )
+
   if (!student)
     return (
-      <div className='flex h-full items-center justify-center'>
-        Estudante não encontrado
+      <div className="flex items-center justify-center min-h-screen">
+    <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+      <div className="flex justify-center mb-6">
+        <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
       </div>
+      <center><h2 className="text-2xl font-semibold mb-6">O estudante não foi encontrado!</h2></center>
+  </div>
+  </div>
     )
 
     if (student.isFilled)
       return (
-        <div className='flex h-full items-center justify-center'>
-          Formulário já preenchido!
+        <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+        <div className="flex justify-center mb-6">
+          <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
         </div>
+        <center><h2 className="text-2xl font-semibold mb-6">Os dados para a matrícula já foram preenchidos!</h2></center>
+    </div>
+    </div>
       )
 
   return (
@@ -223,7 +247,7 @@ export default function FormularioMatricula() {
         <div className="flex justify-center mb-6">
           <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
         </div>
-        <Form layout="vertical" form={form} className="space-y-6" onValuesChange={onValuesChange} onFinish={handleSubmit}>
+        <Form layout="vertical" form={form} className="space-y-6" onValuesChange={onValuesChange} onFinish={handleSubmit} hidden = {isFormHidden} >
           {/* Dados do Aluno */}
           <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
             <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula</h2>
