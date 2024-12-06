@@ -1,9 +1,9 @@
 export type StudentDTO = {
-    name: string;
+    name?: string;
     isFilled?: boolean;
-    categorie: CategorieType;
-    class: ClassType;
-    turn: TurnType;
+    categorie?: CategorieType;
+    class?: ClassType;
+    turn?: TurnType;
     dataNascimento?: string;
     naturalidadeAluno?: string;
     endereco?: string;

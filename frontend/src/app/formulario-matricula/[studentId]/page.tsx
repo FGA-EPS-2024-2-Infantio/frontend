@@ -1,7 +1,7 @@
 'use client'
 import { updateStudent, fetchStudentById } from '@/store/slices/studentSlice';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Radio, Table, Spin } from 'antd';
+import { Button, Checkbox, Form, Input, Radio, Table, Spin, FormInstance } from 'antd';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import InputMask from 'react-input-mask';
@@ -44,9 +44,16 @@ export default function FormularioMatricula() {
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
   const [form] = Form.useForm();
 
-  const onValuesChange = (changedValues, allValues) => {
+  interface FormValues {
+    aceiteResponsabilidade: boolean;
+    autorizacaoImagens: boolean;
+  }
+  
+  const onValuesChange = (
+    changedValues: Partial<FormValues>,
+    allValues: FormValues
+  ) => {
     const { aceiteResponsabilidade, autorizacaoImagens } = allValues;
-    // Habilita o botão somente se ambos os checkboxes estiverem marcados
     setIsSubmitDisabled(!(aceiteResponsabilidade && autorizacaoImagens));
   };
 
@@ -148,11 +155,11 @@ export default function FormularioMatricula() {
         // Atualizar os dados do aluno aqui
         const updatedData = form.getFieldsValue();
         const studentData = {
-          name: student.name,
+          name: student?.name,
           isFilled: true,
-          categorie: student.categorie,
-          class:student.class,
-          turn:student.turn,
+          categorie: student?.categorie,
+          class:student?.class,
+          turn:student?.turn,
           dataNascimento: updatedData.dataNascimento,
           naturalidadeAluno: updatedData.naturalidadeAluno,
           cep:updatedData.cep,
