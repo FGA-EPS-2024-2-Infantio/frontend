@@ -4,13 +4,17 @@ import { deleteStudentById, fetchStudentById } from '@/store/slices/studentSlice
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Spin } from 'antd'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 export default function StudentDetails() {
+
   const { studentId } = useParams()
+  const origin = window.location.origin;
+  const pathname = usePathname().split('/')[2];
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error, student } = useSelector(
     (state: RootState) => state.student
@@ -31,9 +35,8 @@ export default function StudentDetails() {
   }, [error])
 
   const copyToClipboard = () => {
-    // TODO recuperar link de cadastro do aluno
 
-    navigator.clipboard.writeText('LINK CADASTRO ALUNO')
+    navigator.clipboard.writeText(origin + "/formulario-matricula/" + pathname)
     toast.info('Link Copiado com Sucesso')
   }
 
@@ -92,7 +95,6 @@ export default function StudentDetails() {
         Estudante não encontrado
       </div>
     )
-    console.log(student);
   return (
     <div className='mx-6 space-y-4 rounded-lg bg-white p-6 shadow-lg'>
       <div className='mb-4 flex items-center justify-between'>

@@ -37,9 +37,16 @@ export default function FormularioMatricula() {
   );
   const [isModalObservacaoVisible, setIsModalObservacaoVisible] = useState(false);
   const [isModalResponsavelVisible, setIsModalResponsavelVisible] = useState(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [observacoes, setObservacoes] = useState<Observacao[]>([]);
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
   const [form] = Form.useForm();
+
+  const onValuesChange = (changedValues, allValues) => {
+    const { aceiteResponsabilidade, autorizacaoImagens } = allValues;
+    // Habilita o botão somente se ambos os checkboxes estiverem marcados
+    setIsSubmitDisabled(!(aceiteResponsabilidade && autorizacaoImagens));
+  };
 
   useEffect(() => {
     if (studentIdStr) {
@@ -216,7 +223,7 @@ export default function FormularioMatricula() {
         <div className="flex justify-center mb-6">
           <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
         </div>
-        <Form layout="vertical" form={form} className="space-y-6" onFinish={handleSubmit}>
+        <Form layout="vertical" form={form} className="space-y-6" onValuesChange={onValuesChange} onFinish={handleSubmit}>
           {/* Dados do Aluno */}
           <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
             <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula</h2>
@@ -314,13 +321,17 @@ export default function FormularioMatricula() {
                 <Input placeholder="Nome do hospital" />
               </Form.Item>
               <Form.Item label="Telefone Hospital" name="telefoneHospital">
-                <Input placeholder="Telefone do hospital" />
+              <InputMask mask="(99) 99999-9999">
+                  {(inputProps) => <Input {...inputProps} placeholder="Telefone do Hospital" />}
+                </InputMask>
               </Form.Item>
               <Form.Item label="Médico" name="medico">
                 <Input placeholder="Nome do médico" />
               </Form.Item>
               <Form.Item label="Telefone Médico" name="telefoneMedico">
-                <Input placeholder="Telefone do médico" />
+              <InputMask mask="(99) 99999-9999">
+                  {(inputProps) => <Input {...inputProps} placeholder="Telefone do Médico" />}
+                </InputMask>
               </Form.Item>
               <Form.Item label="Endereço Hospital" name="enderecoHospital">
                 <Input placeholder="Endereço completo do hospital" />
@@ -358,20 +369,20 @@ export default function FormularioMatricula() {
           </div>
 
           {/* Termos de Responsabilidade */}
-          <Form.Item name="aceiteResponsabilidade" valuePropName="checked" required>
+          <Form.Item name="aceiteResponsabilidade" valuePropName="checked" required rules={[{ required: true, message: "Este campo é obrigatório." }]}>
             <Checkbox>
-              Aceito a responsabilidade de matrícula e documentos
+            Assumo inteira responsabilidade pelas informações e pelo pagamento.
             </Checkbox>
           </Form.Item>
-          <Form.Item name="autorizacaoImagens" valuePropName="checked" required>
+          <Form.Item name="autorizacaoImagens" valuePropName="checked" required rules={[{ required: true, message: "Este campo é obrigatório." }]}>
             <Checkbox>
-              Autorizo a utilização da imagem para atividades escolares
+            Autorizo que fotos e filmagens que incluam meu/minha filho(a) sejam feitas e utilizadas pela equipe da escola para fins pedagógicos, para publicação no site/da escola/da turma, e para fins de divulgação nas redes sociais. Estou ciente de que as imagens serão usadas apenas para fins pedagógicos e não comerciais, resguardadas as limitações legais e jurídicas.
             </Checkbox>
           </Form.Item>
 
           {/* Botões de Ação */}
           <div className="flex justify-between">
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
               Enviar Matrícula
             </Button>
           </div>
