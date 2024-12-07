@@ -4,6 +4,7 @@ import { fetchTeacherById } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Spin } from 'antd'
+import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -66,6 +67,16 @@ export default function TeacherDetails() {
     return items
   }, [])
 
+  const session = useSession()
+
+  if (session.data?.user.role !== 'ADMIN' && session.data?.user.role !== 'DIRECTOR') {
+    return (
+      <div className='mx-6 rounded-lg bg-white p-6 shadow-lg'>
+        <div className='mb-4 flex items-center justify-between'>Você não possui autorização para visualizar essa tela!</div>
+      </div>
+    )
+  }
+  
   if (loading)
     return (
       <div className='flex h-full items-center justify-center'>

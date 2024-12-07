@@ -4,6 +4,7 @@ import { deleteStudentById, fetchStudentById } from '@/store/slices/studentSlice
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Spin } from 'antd'
+import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -79,6 +80,16 @@ export default function StudentDetails() {
 
     return items
   }, [handleDeactivateStudent, student?.disabled])
+
+  const session = useSession()
+
+  if (session.data?.user.role !== 'ADMIN' && session.data?.user.role !== 'DIRECTOR') {
+    return (
+      <div className='mx-6 rounded-lg bg-white p-6 shadow-lg'>
+        <div className='mb-4 flex items-center justify-between'>Você não possui autorização para visualizar essa tela!</div>
+      </div>
+    )
+  }
 
   if (loading)
     return (

@@ -3,6 +3,7 @@
 import {
   BookOutlined,
   HomeOutlined,
+  LogoutOutlined,
   TeamOutlined,
   UserOutlined
 } from '@ant-design/icons'
@@ -30,22 +31,25 @@ function getItem(
   } as MenuItem
 }
 
-const items: MenuItem[] = [
-  getItem('Escolas', '1', <HomeOutlined />),
-  getItem('Alunos', '2', <UserOutlined />),
-  getItem('Professores', '3', <TeamOutlined />),
-  getItem('Turmas', '4', <BookOutlined />),
-  getItem('Perfil', '5', <UserOutlined />)
-]
-
 type Props = {
-  session: Session
+  session: Session // "ADMIN" | "TEACHER" | "DIRECTOR" | "USER"
 }
 
 export default function Sidebar({ session }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const router = useRouter()
+
+  const items: MenuItem[] = [
+    session.user.role === 'ADMIN' && getItem('Escolas', '1', <HomeOutlined />),
+    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+      getItem('Alunos', '2', <UserOutlined />),
+    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+      getItem('Professores', '3', <TeamOutlined />),
+    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+      getItem('Turmas', '4', <BookOutlined />),
+    getItem('Perfil', '5', <UserOutlined />)
+  ].filter(Boolean) as MenuItem[]
 
   const handleMenuClick: MenuProps['onClick'] = e => {
     setSelectedKey(e.key)
@@ -100,7 +104,7 @@ export default function Sidebar({ session }: Props) {
             className='w-full'
             onClick={() => router.push('/api/auth/signout')}
           >
-            Sair do Sistema
+            {collapsed ? <LogoutOutlined /> : 'Sair do sistema'}
           </Button>
         </div>
 

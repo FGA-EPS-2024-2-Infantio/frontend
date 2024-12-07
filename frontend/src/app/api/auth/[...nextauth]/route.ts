@@ -9,7 +9,6 @@ async function refreshToken(token: JWT): Promise<JWT> {
       authorization: `Refresh ${token.backendTokens.refreshToken}`
     }
   })
-  console.log('refreshed')
 
   const response = await res.json()
 
@@ -27,9 +26,9 @@ export const authOptions: NextAuthOptions = {
         username: {
           label: 'Username',
           type: 'Text',
-          placeholder: 'jsmith'
+          placeholder: 'E-mail'
         },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Senha', type: 'password' }
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials.password) return null
