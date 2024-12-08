@@ -1,6 +1,8 @@
 export type CreateSchoolType = {
   name: string
+  directorName: string
   directorEmail: string
+  directorPassword: string
   numberStudents: number
 }
 

@@ -103,6 +103,16 @@ export default function ModalSaveSchool({
         </Form.Item>
 
         <Form.Item
+          name='directorName'
+          label='Nome do direitor'
+          rules={[
+            { required: true, message: 'Por favor, insira o nome do diretor' }
+          ]}
+        >
+          <Input placeholder='Nome da diretor' />
+        </Form.Item>
+
+        <Form.Item
           name='directorEmail'
           label='E-mail do Diretor'
           rules={[
@@ -114,6 +124,20 @@ export default function ModalSaveSchool({
           ]}
         >
           <Input placeholder='E-mail do Diretor' />
+        </Form.Item>
+
+        <Form.Item
+          name='directorPassword'
+          label='Senha de acesso do diretor'
+          rules={[
+            {
+              required: true,
+              message: 'Por favor, insira a senha do diretor'
+            },
+            { required:true, message: 'Por favor, insira uma senha' }
+          ]}
+        >
+          <Input placeholder='Senha do Diretor' />
         </Form.Item>
 
         <Form.Item
