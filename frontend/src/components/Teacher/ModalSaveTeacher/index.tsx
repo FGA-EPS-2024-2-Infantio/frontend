@@ -1,11 +1,11 @@
-import { createTeacher, fetchTeacherById, fetchTeachers, updateTeacher, fetchSchools } from '@/store/slices/teacherSlice'
+import { createTeacher, fetchSchools, fetchTeacherById, fetchTeachers, updateTeacher } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { CreateTeacherType, TeacherResponseDto } from '@/types/Teachers'
 import { Button, DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import dayjs from 'dayjs'
 
 type Props = {
   isModalOpen: boolean
@@ -126,6 +126,26 @@ export default function ModalSaveTeacher({
           ]}
         >
           <Input placeholder="Nome do Professor" />
+        </Form.Item>
+
+        <Form.Item
+          name="email"
+          label="E-mail do Professor"
+          rules={[
+            { required: true, message: 'Por favor, insira o e-mail do professor' }
+          ]}
+        >
+          <Input placeholder="E-mail do Professor" />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          label="Senha do Professor"
+          rules={[
+            { required: true, message: 'Por favor, insira a senha do professor' }
+          ]}
+        >
+          <Input placeholder="Senha do Professor" />
         </Form.Item>
 
         <Form.Item

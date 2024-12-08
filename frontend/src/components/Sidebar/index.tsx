@@ -1,8 +1,15 @@
 'use client'
 
-import { BookOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons'
+import {
+  BookOutlined,
+  HomeOutlined,
+  LogoutOutlined,
+  TeamOutlined,
+  UserOutlined
+} from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { Layout, Menu } from 'antd'
+import { Button, Layout, Menu } from 'antd'
+import { Session } from 'next-auth'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
@@ -24,17 +31,25 @@ function getItem(
   } as MenuItem
 }
 
-const items: MenuItem[] = [
-  getItem('Escolas', '1', <HomeOutlined />),
-  getItem('Alunos', '2', <UserOutlined />),
-  getItem('Professores', '3', <UserOutlined />),
-  getItem('Turmas', '4', <BookOutlined />),
-]
+type Props = {
+  session: Session // "ADMIN" | "TEACHER" | "DIRECTOR" | "USER"
+}
 
-export default function Sidebar() {
+export default function Sidebar({ session }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const router = useRouter()
+
+  const items: MenuItem[] = [
+    session.user.role === 'ADMIN' && getItem('Escolas', '1', <HomeOutlined />),
+    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+      getItem('Alunos', '2', <UserOutlined />),
+    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+      getItem('Professores', '3', <TeamOutlined />),
+    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+      getItem('Turmas', '4', <BookOutlined />),
+    getItem('Perfil', '5', <UserOutlined />)
+  ].filter(Boolean) as MenuItem[]
 
   const handleMenuClick: MenuProps['onClick'] = e => {
     setSelectedKey(e.key)
@@ -48,6 +63,9 @@ export default function Sidebar() {
     }
     if (e.key === '4') {
       router.push('/turmas')
+    }
+    if (e.key === '5') {
+      router.push(`/perfil/${session?.user.id}`)
     }
   }
 
@@ -71,6 +89,25 @@ export default function Sidebar() {
         >
           Infantio
         </div>
+
+        <div className='flex flex-col items-center gap-4 border-b border-gray-200 p-4'>
+          <div className='text-sm font-medium text-gray-700'>
+            Olá{' '}
+            <span className='font-bold text-green-700'>
+              {session.user.name}
+            </span>
+            !
+          </div>
+          <Button
+            type='primary'
+            danger
+            className='w-full'
+            onClick={() => router.push('/api/auth/signout')}
+          >
+            {collapsed ? <LogoutOutlined /> : 'Sair do sistema'}
+          </Button>
+        </div>
+
         <Menu
           mode='inline'
           items={items}

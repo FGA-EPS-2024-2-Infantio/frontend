@@ -7,6 +7,7 @@ import { SchoolResponseDto } from '@/types/Schools'
 import type { TableProps } from 'antd'
 import { Button, Table } from 'antd'
 import classNames from 'classnames'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -62,6 +63,16 @@ export default function Schools() {
 
   const handleRowClick = (record: SchoolResponseDto) => {
     router.push(`/escolas/${record.id}`)
+  }
+
+  const session = useSession()
+
+  if (session.data?.user.role !== 'ADMIN') {
+    return (
+      <div className='mx-6 rounded-lg bg-white p-6 shadow-lg'>
+        <div className='mb-4 flex items-center justify-between'>Você não possui autorização para visualizar essa tela!</div>
+      </div>
+    )
   }
 
   return (
