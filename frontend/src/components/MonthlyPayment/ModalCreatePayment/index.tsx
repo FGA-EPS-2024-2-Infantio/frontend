@@ -4,7 +4,7 @@ import { createPayment, updateMonthlyPayment } from '@/store/slices/paymentSlice
 import { fetchStudentById } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { MonthlyPaymentDto, MonthlyPaymentResponseDto } from '@/types/Payment'
-import { Button, DatePicker, Form, InputNumber, Modal, Select, Switch } from 'antd'
+import { Button, DatePicker, Form, InputNumber, Modal, Switch } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -34,7 +34,6 @@ export default function ModalCreatePayment({
   }
 
   useEffect(() => {
-    console.log(`Monthly Payment to edit: ${monthlyPaymentToEdit}`)
     if (isModalOpen && monthlyPaymentToEdit) {
       form.setFieldsValue({
         date: dayjs(`${monthlyPaymentToEdit.year}-${monthlyPaymentToEdit.month}-05`),
@@ -57,7 +56,6 @@ export default function ModalCreatePayment({
         year: date.year(),
 
       }
-      console.log(payment)
       
       const action = monthlyPaymentToEdit ? 
       await dispatch(updateMonthlyPayment({ monthlyPaymentId: monthlyPaymentToEdit.id, data: payment })) : 
@@ -78,12 +76,6 @@ export default function ModalCreatePayment({
     }
   }
 
-  const selectAfter = (
-    <Select defaultValue="BRL" style={{ width: 60 }}>
-      <Select.Option value="BRL">R$</Select.Option>
-    </Select>
-  );
-
   return (
     <Modal
       open={isModalOpen}
@@ -98,6 +90,9 @@ export default function ModalCreatePayment({
         layout='vertical'
         onFinish={handleCreatePayment}
         className='space-y-4'
+        initialValues={{
+          payed: true, 
+        }}
       >
         <Form.Item
           name='value'
@@ -112,7 +107,7 @@ export default function ModalCreatePayment({
             step={0.01}
             style={{ width: '50%' }}
             placeholder="Digite o valor"
-            addonAfter={selectAfter}
+            addonAfter={'R$'}
           />
         </Form.Item>
 
@@ -135,12 +130,13 @@ export default function ModalCreatePayment({
         <Form.Item
           name='payed'
           label='Pago'
+          valuePropName='checked'
           rules={[{
             required: true, message: 'Necessário indicar se foi pago'
           }]}
          >
           <Switch
-            defaultChecked
+            defaultChecked={true}
           />
         </Form.Item>
 
