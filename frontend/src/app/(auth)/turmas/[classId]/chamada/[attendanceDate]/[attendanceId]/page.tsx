@@ -1,124 +1,144 @@
 "use client"
 
-import { createAttendance, fetchAttendanceByDate, fetchAttendanceById, updateAttendance } from "@/store/slices/attendanceSlice";
+import { createAttendance, fetchAttendanceByDate, updateAttendance } from "@/store/slices/attendanceSlice";
 import { fetchStudents } from "@/store/slices/studentSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
-import { TableProps, Checkbox, Spin, FormProps, Form, DatePicker, Divider, Table, Button, Typography } from "antd";
+import { TableProps, Checkbox, Spin, FormProps, Form, Divider, Table, Button, Typography } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Page = () => {
-    const {classId,attendanceDate,attendanceId} = useParams();
-    const [studentList, setStudentList] = useState<CreateAttendanceType[]>([])
-    const classIdStr = Array.isArray(classId) ? classId[0] : classId
-    
+  const { classId, attendanceDate } = useParams();
+  const [studentList, setStudentList] = useState<CreateAttendanceType[]>([]);
 
-    
+  const classIdStr = Array.isArray(classId) ? classId[0] : classId;
+  const dispatch = useDispatch<AppDispatch>();
 
-    const dispatch = useDispatch<AppDispatch>()
+  const { loading, error, classObj } = useSelector((state: RootState) => state.class);
+  const attendancesByDate = useSelector((state: RootState) => state.attendence.attendancesByDate);
+  
+  useEffect(() => {
+    // Carregar alunos e presenças
+    dispatch(fetchStudents());
+    if (attendanceDate) {
+      const decodedDate = decodeURIComponent(attendanceDate);
+      dispatch(fetchAttendanceByDate(decodedDate)); // Carregar as presenças
+    }
+  }, [dispatch, attendanceDate]);
 
-    const { loading, error, classObj } = useSelector(
-        (state: RootState) => state.class
-      )
-      const attendancesByDate = useSelector((state: RootState) => state.attendence.attendancesByDate);
-      const attendancesByDateError = useSelector((state: RootState) => state.attendence.error);
-
-      useEffect(() => {
-        dispatch(fetchStudents())
-        const students: CreateAttendanceType[] = []
-        classObj?.students.forEach(student => students.push({studentId: student.id, classId: classIdStr, date: new Date(), hasAttended: false}))
-        setStudentList(students)
-      }, [dispatch])
-    
-      useEffect(() => {
-
-        const decodedDate = decodeURIComponent(attendanceDate || '');
-          console.log('Fetching attendance by date:', decodedDate); 
-          dispatch(fetchAttendanceByDate(decodedDate));
-        
-      }, [dispatch]); 
-   
-
-      useEffect(()=>{
-        console.log("isso",attendancesByDate)
-
-      },[])
+  useEffect(() => {
+    // Atualizar lista de alunos quando a lista de estudantes ou presenças mudar
+    if (classObj?.students && attendancesByDate) {
+      const formattedDate = attendanceDate ? new Date(decodeURIComponent(attendanceDate)).toISOString() : '';
       
-      const handleChange = (event: CheckboxChangeEvent) => {
-        const isChecked = event.target.checked;
-        const studentIndex = studentList.findIndex(student => student.studentId === event.target.id);
-        studentList[studentIndex].hasAttended = isChecked;
+      const updatedStudentList: CreateAttendanceType[] = classObj.students.map(student => {
+        const attendance = attendancesByDate.find(
+          (attendance) => attendance.studentId === student.id
+        );
+        
+        return {
+          studentId: student.id,
+          classId: classIdStr,
+          date: formattedDate ? new Date(formattedDate) : new Date(),
+          hasAttended: attendance ? attendance.hasAttended : false,
+        };
+      });
+      
+      setStudentList(updatedStudentList);
+    }
+  }, [classObj, attendancesByDate, attendanceDate]);
+
+  const handleChange = (event: CheckboxChangeEvent) => {
+    const isChecked = event.target.checked;
+    const studentIndex = studentList.findIndex(student => student.studentId === event.target.id);
+    
+    if (studentIndex === -1) return; // Garantir que o índice do aluno seja válido
+    
+    // Atualizar de forma imutável
+    const updatedStudentList = studentList.map((student, index) => {
+      if (index === studentIndex) {
+        return { ...student, hasAttended: isChecked };
       }
+      return student;
+    });
 
-      type DataType = {
-        studentId: string,
-        studentName:string,
-      }
+    setStudentList(updatedStudentList);
+  };
 
-      const columns: TableProps<DataType>['columns'] = [
-        {
-          title: 'Nome do Aluno',
-          dataIndex: 'studentName',
-          key: 'name',
-          render: text => <strong>{text}</strong>
-        },
-        {
-            title: "Presente",
-            key: "attendance",
-            render: (_, record) => <Checkbox id={record.studentId} defaultChecked={attendancesByDate.find(attendance => attendance.studentId === record.studentId)?.hasAttended as boolean} onChange={handleChange} />,
-        },
-      ]
+  type DataType = {
+    studentId: string;
+    studentName: string;
+  };
 
-      if(!classObj) {
-        return <div className='flex h-full items-center justify-center'>
+  const columns: TableProps<DataType>['columns'] = [
+    {
+      title: 'Nome do Aluno',
+      dataIndex: 'studentName',
+      key: 'name',
+      render: (text) => <strong>{text}</strong>
+    },
+    {
+      title: "Presente",
+      key: "attendance",
+      render: (_, record) => (
+        <Checkbox 
+          id={record.studentId} 
+          checked={studentList.find(attendance => attendance.studentId === record.studentId)?.hasAttended || false} 
+          onChange={handleChange}
+        />
+      ),
+    },
+  ];
+
+  if (!classObj) {
+    return (
+      <div className='flex h-full items-center justify-center'>
         <Spin size='large' />
       </div>
-      }
-    
-      const data: DataType[] = classObj?.students.map(student => ({
-        studentId: student.id,
-        studentName: student.name,
-      }))
+    );
+  }
 
-      type FieldType = {
-        username?: string;
-        password?: string;
-        remember?: string;
-      };
-      
-      const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-        console.log('Success: ', values, studentList);
-        studentList.forEach((student) => {
-          
-          console.log("id chamda",attendanceId);
-          if(!attendanceId) return;
-          dispatch(updateAttendance({id: attendanceId, data: student}))
-        })
-      };
-      
-      const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-      };
+  const data: DataType[] = classObj.students.map(student => ({
+    studentId: student.id,
+    studentName: student.name,
+  }));
 
-    return <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
-       <Typography.Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>
-    Chamada do dia {new Date(decodeURIComponent(attendanceDate)).toLocaleDateString('pt-BR')}
-  </Typography.Title>
-        
+  type FieldType = {
+    username?: string;
+    password?: string;
+    remember?: string;
+  };
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async () => {
+    console.log('Success: ', studentList);
+    dispatch(updateAttendance({ data: studentList }));
+  };
+
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  return (
+    <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Typography.Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>
+        Lista de Chamada
+      </Typography.Title>
+
       <Divider />
       <Table<DataType>
         columns={columns}
         dataSource={data}
       />
       <Form.Item label={null}>
-      <Button type="primary" htmlType="submit">
-        Salvar
-      </Button>
-    </Form.Item>
+        <Button type="primary" htmlType="submit">
+          Salvar
+        </Button>
+      </Form.Item>
     </Form>
+  );
 };
 
-export default Page
+export default Page;

@@ -61,6 +61,7 @@ export const fetchAttendanceByDate = createAsyncThunk(
   'attendances/fetchAttendanceByDate',
   async (date: string, { rejectWithValue }) => {
     try {
+      console.log(date)
       const response = await axiosInstance.get(`/attendances/date/${date}`)
       return response.data
     } catch (error) {
@@ -88,11 +89,11 @@ export const createAttendance = createAsyncThunk(
 export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
   async (
-    { id, data }: { id: string; data: CreateAttendanceType },
+    { data }: { data: CreateAttendanceType[] },
     { rejectWithValue }
   ) => {
     try {
-      const response = await axiosInstance.patch(`/attendances/${id}`, data)
+      const response = await axiosInstance.patch(`/attendances/attendanceList/List`, data)
       return response.data
     } catch (error) {
       return rejectWithValue(

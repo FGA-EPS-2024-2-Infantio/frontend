@@ -35,15 +35,13 @@ export default function ClassDetails() {
   const filteredAttendances: AttendanceResponseDto[] = [];
 
   attendances.forEach(attendance => {
-    const formattedDate = new Date(attendance.date).toDateString().split("T")[0];
+    const formattedDate = new Date(attendance.date).toDateString().split('T')[0];
 
     if (!uniqueDates.has(formattedDate)) {
       uniqueDates.add(formattedDate);
       filteredAttendances.push(attendance);
     }
   });
-
-  console.log(filteredAttendances);
 
   const router = useRouter()
 
@@ -143,9 +141,9 @@ export default function ClassDetails() {
   }, [handleDeactivateClass, classObj?.disabled])
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const attendanceId = event.currentTarget.id; 
-    const attendanceDate = event.currentTarget.getAttribute('data-id'); 
-    
+    const attendanceId = event.currentTarget.id;
+    const attendanceDate = event.currentTarget.getAttribute('data-id');
+
     if (attendanceDate && attendanceId) {
       router.push(`${classId}/chamada/${attendanceDate}/${attendanceId}`);
     }
@@ -182,8 +180,8 @@ export default function ClassDetails() {
         <div className='flex items-center gap-4'>
           <span
             className={`rounded-full px-3 py-1 text-sm font-medium ${classObj.disabled
-                ? 'bg-red-100 text-red-700'
-                : 'bg-green-100 text-green-700'
+              ? 'bg-red-100 text-red-700'
+              : 'bg-green-100 text-green-700'
               }`}
           >
             {classObj.disabled ? 'Desabilitada' : 'Habilitada'}
@@ -193,7 +191,7 @@ export default function ClassDetails() {
             <span className='font-medium'>{classObj.teacher.name}</span>
           </p>
           <Button type='primary' size='large' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
-            + Criar nova chamada 
+            + Criar nova chamada
           </Button  >
         </div>
       </div>
@@ -255,12 +253,18 @@ export default function ClassDetails() {
                 onClick={handleClick}
                 key={attendance.id}
                 id={attendance.id}
-                data-id={attendance.date.toString()}
+                data-id={attendance.date ? new Date(attendance.date).toISOString().split('T')[0] : ''}
                 className='flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm hover:shadow-md hover:cursor-pointer'
               >
                 <div className='flex-1'>
                   <p className="font-medium text-gray-900">
-                    {`${new Date(attendance.date).getDate().toString().padStart(2, '0')}/${(new Date(attendance.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(attendance.date).getFullYear()}`}
+                    {(() => {
+                      const date = new Date(attendance.date);
+                      const day = date.getUTCDate().toString().padStart(2, '0');
+                      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+                      const year = date.getUTCFullYear();
+                      return `${day}/${month}/${year}`;
+                    })()}
                   </p>
                 </div>
               </div>

@@ -10,6 +10,6 @@ export type CreateAttendanceType = {
     studentId: string
     studentName: string
     date: Date;
-    hasAttended: Boolean
+    hasAttended: boolean
   }
   
