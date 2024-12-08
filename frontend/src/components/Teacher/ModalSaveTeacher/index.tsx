@@ -112,7 +112,7 @@ export default function ModalSaveTeacher({
       destroyOnClose={true}
     >
       <Form
-        form={form}
+        form={form}  // Passando a instância do form aqui
         layout="vertical"
         onFinish={handleSaveTeacher}
         className="space-y-4"
