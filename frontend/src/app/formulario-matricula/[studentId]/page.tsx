@@ -1,12 +1,16 @@
 'use client'
-
+import { updateStudent, fetchStudentById } from '@/store/slices/studentSlice';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Radio, Table } from 'antd';
+import { Button, Checkbox, Form, Input, Radio, Table, Spin, FormInstance } from 'antd';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useParams } from 'next/navigation';
 import InputMask from 'react-input-mask';
-import ModalObservacao from '../../components/Matricula/ModalObservacao/index';
-import ModalResponsavel from '../../components/Matricula/ModalResponsavel';
+import ModalObservacao from '../../../components/Matricula/ModalObservacao/index';
+import ModalResponsavel from '../../../components/Matricula/ModalResponsavel';
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/store/store'
+import { toast } from 'react-toastify'
 
 // Tipo para observações
 type Observacao = {
@@ -23,12 +27,41 @@ type Responsavel = {
   telefone: string;
 };
 
+
+
 export default function FormularioMatricula() {
+  const { studentId } = useParams();
+  const studentIdStr = Array.isArray(studentId) ? studentId[0] : studentId;
+  const dispatch = useDispatch<AppDispatch>()
+  const { loading, student } = useSelector(
+    (state: RootState) => state.student
+  );
   const [isModalObservacaoVisible, setIsModalObservacaoVisible] = useState(false);
   const [isModalResponsavelVisible, setIsModalResponsavelVisible] = useState(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const [isFormHidden, setIsFormHidden] = useState(false);
   const [observacoes, setObservacoes] = useState<Observacao[]>([]);
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
   const [form] = Form.useForm();
+
+  interface FormValues {
+    aceiteResponsabilidade: boolean;
+    autorizacaoImagens: boolean;
+  }
+  
+  const onValuesChange = (
+    changedValues: Partial<FormValues>,
+    allValues: FormValues
+  ) => {
+    const { aceiteResponsabilidade, autorizacaoImagens } = allValues;
+    setIsSubmitDisabled(!(aceiteResponsabilidade && autorizacaoImagens));
+  };
+
+  useEffect(() => {
+    if (studentIdStr) {
+      dispatch(fetchStudentById(studentIdStr))
+    }
+  }, [dispatch, studentIdStr]);
 
   // Colunas para Observações sobre o Aluno
   const columnsObservacoes = [
@@ -83,13 +116,15 @@ export default function FormularioMatricula() {
       ),
     },
   ];
-// Adicionar uma nova observação
-const handleAddObservacao = (titulo: string, descricao: string) => {
-  setObservacoes((prev) => [
-    ...prev,
-    { key: `${prev.length + 1}`, titulo, descricao },
-  ]);
-};
+
+  // Adicionar uma nova observação
+  const handleAddObservacao = (titulo: string, descricao: string) => {
+    setObservacoes((prev) => [
+      ...prev,
+      { key: `${prev.length + 1}`, titulo, descricao },
+    ]);
+  };
+
   // Remover uma observação
   const handleDeleteObservacao = (key: string) => {
     setObservacoes((prev) => prev.filter((item) => item.key !== key));
@@ -102,35 +137,131 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
       { key: `${prev.length + 1}`, nome, parentesco, telefone: telefoneFormatado },
     ]);
   };
-  
 
   // Remover um responsável
   const handleDeleteResponsavel = (key: string) => {
     setResponsaveis((prev) => prev.filter((item) => item.key !== key));
   };
 
+  
+  
+
   // Envio do formulário
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = () => {
     form.validateFields(['aceiteResponsabilidade', 'autorizacaoImagens'])
       .then(() => {
-        console.log('Termos aceitos! Dados enviados.');
+        
+        // Atualizar os dados do aluno aqui
+        const updatedData = form.getFieldsValue();
+        const studentData = {
+          name: student?.name,
+          isFilled: true,
+          categorie: student?.categorie,
+          class:student?.class,
+          turn:student?.turn,
+          dataNascimento: updatedData.dataNascimento,
+          naturalidadeAluno: updatedData.naturalidadeAluno,
+          cep:updatedData.cep,
+          endereco:updatedData.endereco,
+          mae: {
+            nome: updatedData.nomeMae,
+            telefone: updatedData.telefoneMae,
+            rg: updatedData.rgMae,
+            cpf: updatedData.cpfMae,
+            naturalidade: updatedData.naturalidadeMae,
+          },
+          pai: {
+            nome: updatedData.nomePai,
+            telefone: updatedData.telefonePai,
+            rg: updatedData.rgPai,
+            cpf: updatedData.cpfPai,
+            naturalidade: updatedData.naturalidadePai,
+          },
+          observacoesMedicas:{
+            hospital: updatedData.hospital,
+            telefoneHospital: updatedData.telefoneHospital,
+            medico: updatedData.medico,
+            telefoneMedico: updatedData.telefoneMedico,
+            enderecoHospital: updatedData.enderecoHospital,
+            possuiConvenio: updatedData.possuiConvenio,
+            alergias: updatedData.alergias,
+            medicamentosFebre: updatedData.medicamentosFebre,
+            medicamentosVomito: updatedData.medicamentosVomito,
+            observacoesGerais: updatedData.observacoesGerais
+          },
+          responsaveis: responsaveis.map((resp) => ({
+            nome: resp.nome,
+            parentesco: resp.parentesco,
+            telefone: resp.telefone,
+          })),
+          observacoes: observacoes.map((obs) => ({
+            titulo: obs.titulo,
+            descricao: obs.descricao
+          }))
+        };
+  
+        dispatch(updateStudent({ id: studentIdStr, data: studentData }));
+        setIsFormHidden(true);
+        toast.success('Formulário enviado com sucesso!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+
       })
       .catch(() => {
         console.error('Por favor, aceite os termos obrigatórios.');
+        toast.error('Por favor, aceite os termos obrigatórios.')
       });
   };
 
-  return (
-  <div className="flex items-center justify-center min-h-screen">
-  <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
-  <div className="flex justify-center mb-6">
-    <Image src="/img/logo.svg" alt="Logo" width={80} height={80}/>
+  if (loading)
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+        <div className="flex justify-center mb-6">
+          <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
+        </div>
+        <Spin size='large' />
+    </div>
+    </div>
+      )
+
+  if (!student)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+    <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+      <div className="flex justify-center mb-6">
+        <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
+      </div>
+      <center><h2 className="text-2xl font-semibold mb-6">O estudante não foi encontrado!</h2></center>
   </div>
-    <Form layout="vertical" className="space-y-6">
-            {/* Dados do Aluno */}
-           <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
-            <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula do Aluno</h2>
+  </div>
+    )
+
+    if (student.isFilled)
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+        <div className="flex justify-center mb-6">
+          <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
+        </div>
+        <center><h2 className="text-2xl font-semibold mb-6">Os dados para a matrícula já foram preenchidos!</h2></center>
+    </div>
+    </div>
+      )
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-6 rounded-md shadow-lg max-w-4xl w-full border">
+        <div className="flex justify-center mb-6">
+          <Image src="/img/logo.svg" alt="Logo" width={80} height={80} />
+        </div>
+        <Form layout="vertical" form={form} className="space-y-6" onValuesChange={onValuesChange} onFinish={handleSubmit} hidden = {isFormHidden} >
+          {/* Dados do Aluno */}
+          <div className="border p-8 rounded-md shadow-sm bg-white mb-6 text-center">
+            <h2 className="text-2xl font-semibold mb-6">Dados para Matrícula</h2>
+            {student.name && (<h2 className="text-2xl font-semibold mb-6">{student.name}</h2>)}
             <div className="md:col-span-2 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Form.Item label="Data de Nascimento" name="dataNascimento">
@@ -157,7 +288,7 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
           <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
             <h2 className="text-lg font-semibold">Dados da Mãe</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Form.Item label="Nome" name="nomeMae">
+              <Form.Item label="Nome" name="nomeMae" >
                 <Input placeholder="Nome da mãe" />
               </Form.Item>
               <Form.Item label="Telefone" name="telefoneMae">
@@ -224,13 +355,17 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
                 <Input placeholder="Nome do hospital" />
               </Form.Item>
               <Form.Item label="Telefone Hospital" name="telefoneHospital">
-                <Input placeholder="Telefone do hospital" />
+              <InputMask mask="(99) 99999-9999">
+                  {(inputProps) => <Input {...inputProps} placeholder="Telefone do Hospital" />}
+                </InputMask>
               </Form.Item>
               <Form.Item label="Médico" name="medico">
                 <Input placeholder="Nome do médico" />
               </Form.Item>
               <Form.Item label="Telefone Médico" name="telefoneMedico">
-                <Input placeholder="Telefone do médico" />
+              <InputMask mask="(99) 99999-9999">
+                  {(inputProps) => <Input {...inputProps} placeholder="Telefone do Médico" />}
+                </InputMask>
               </Form.Item>
               <Form.Item label="Endereço Hospital" name="enderecoHospital">
                 <Input placeholder="Endereço completo do hospital" />
@@ -267,38 +402,26 @@ const handleAddObservacao = (titulo: string, descricao: string) => {
             <Table columns={columnsObservacoes} dataSource={observacoes} pagination={false} locale={{ emptyText: '' }} />
           </div>
 
-          {/* Termos de Aceite */}
-          <div className="border p-4 rounded-md shadow-sm bg-white mb-6">
-            <h2 className="text-lg font-semibold">Termos de Aceite</h2>
-            <Form.Item
-              name="aceiteResponsabilidade"
-              valuePropName="checked"
-              rules={[{ required: true, message: 'Você precisa aceitar os termos para continuar.' }]}
-            >
-              <Checkbox>
-                Assumo inteira responsabilidade pelas informações e pelo pagamento.
-              </Checkbox>
-            </Form.Item>
-            <Form.Item
-              name="autorizacaoImagens"
-              valuePropName="checked"
-              rules={[{ required: true, message: 'Você precisa autorizar para continuar.' }]}
-            >
-              <Checkbox>
-                Autorizo que fotos e filmagens que incluam meu/minha filho(a) sejam feitas e utilizadas pela equipe da escola para fins pedagógicos, para publicação no site/da escola/da turma, e para fins de divulgação nas redes sociais. Estou ciente de que as imagens serão usadas apenas para fins pedagógicos e não comerciais, resguardadas as limitações legais e jurídicas.
-              </Checkbox>
-            </Form.Item>
-          </div>
+          {/* Termos de Responsabilidade */}
+          <Form.Item name="aceiteResponsabilidade" valuePropName="checked" required rules={[{ required: true, message: "Este campo é obrigatório." }]}>
+            <Checkbox>
+            Assumo inteira responsabilidade pelas informações e pelo pagamento.
+            </Checkbox>
+          </Form.Item>
+          <Form.Item name="autorizacaoImagens" valuePropName="checked" required rules={[{ required: true, message: "Este campo é obrigatório." }]}>
+            <Checkbox>
+            Autorizo que fotos e filmagens que incluam meu/minha filho(a) sejam feitas e utilizadas pela equipe da escola para fins pedagógicos, para publicação no site/da escola/da turma, e para fins de divulgação nas redes sociais. Estou ciente de que as imagens serão usadas apenas para fins pedagógicos e não comerciais, resguardadas as limitações legais e jurídicas.
+            </Checkbox>
+          </Form.Item>
 
-          {/* Botão Salvar */}
-          <div className="flex justify-center mt-4">
-            <Button type="primary" htmlType="submit">
-              Mandar Dados para Matrícula
+          {/* Botões de Ação */}
+          <div className="flex justify-between">
+            <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
+              Enviar Matrícula
             </Button>
           </div>
         </Form>
       </div>
-
       {/* Modal Adicionar Responsável */}
       <ModalResponsavel
         isVisible={isModalResponsavelVisible}

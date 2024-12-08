@@ -4,21 +4,23 @@ import ModalSaveTeacher from '@/components/Teacher/ModalSaveTeacher'
 import { fetchTeachers } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { TeacherResponseDto } from '@/types/Teachers'
-import type { TableProps } from 'antd'
-import { Button, Table } from 'antd'
+import { SchoolResponseDto } from '@/types/Schools'
+import { Table, Button } from 'antd'
 import classNames from 'classnames'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
+import axios from 'axios'
+import axiosInstance from '@/config/AxiosInstance'
 
 export default function Teachers() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const { teachers, loading, error } = useSelector(
-    (state: RootState) => state.teacher
-  )
+  const { teachers, loading, error } = useSelector((state: RootState) => state.teacher)
+  
+  const [schools, setSchools] = useState<{ [id: number]: string }>({})
 
   useEffect(() => {
     dispatch(fetchTeachers())
@@ -26,17 +28,44 @@ export default function Teachers() {
 
   useEffect(() => {
     if (error) {
-      console.log("erro",error)
+      console.log("erro", error)
       toast.error(error)
     }
   }, [error])
 
-  const columns: TableProps<TeacherResponseDto>['columns'] = [
+  // Função para buscar o nome da escola
+  const fetchSchoolName = async (schoolId: number) => {
+    try {
+      const response = await axiosInstance.get(`/schools/${schoolId}`)
+
+      return response.data.name // Supondo que o retorno tenha o campo 'name' da escola
+    } catch (error) {
+      console.error('Erro ao buscar escola:', error)
+      return ''
+    }
+  }
+
+  // Atualizando o estado dos nomes das escolas
+  useEffect(() => {
+    const loadSchoolNames = async () => {
+      const schoolNames: { [id: number]: string } = {}
+      for (const teacher of teachers) {
+        if (!schoolNames[teacher.schoolId]) {
+          const schoolName = await fetchSchoolName(teacher.schoolId)
+          schoolNames[teacher.schoolId] = schoolName
+        }
+      }
+      setSchools(schoolNames)
+    }
+    loadSchoolNames()
+  }, [teachers])
+
+  const columns = [
     {
       title: 'Nome',
       dataIndex: 'name',
       key: 'name',
-      render: text => <strong>{text}</strong>
+      render: (text: string) => <strong>{text}</strong>
     },
     {
       title: 'Número de turmas',
@@ -52,17 +81,23 @@ export default function Teachers() {
       title: 'Data de Início',
       dataIndex: 'startDate',
       key: 'startDate',
-      render: (date) => new Date(date).toLocaleDateString('pt-BR')
+      render: (date: string) => new Date(date).toLocaleDateString('pt-BR')
+    },
+    {
+      title: 'Escola',
+      dataIndex: 'schoolId',
+      key: 'schoolId',
+      render: (schoolId: number) => schools[schoolId] || 'Carregando...'
     }
   ]
 
-  const data: TeacherResponseDto[] = teachers.map((teacher:TeacherResponseDto) => ({
+  const data: TeacherResponseDto[] = teachers.map((teacher: TeacherResponseDto) => ({
     id: teacher.id,
     name: teacher.name,
     numberOfClasses: teacher.numberOfClasses,
-    cpf:teacher.cpf,
+    cpf: teacher.cpf,
     startDate: teacher.startDate,
-    createdAt: teacher.createdAt
+    schoolId: teacher.schoolId
   }))
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -96,12 +131,11 @@ export default function Teachers() {
         onRow={record => ({
           onClick: () => handleRowClick(record)
         })}
-        rowClassName={({  }) =>
+        rowClassName={() =>
           classNames(
             'cursor-pointer hover:bg-gray-100 transition duration-200',
           )
         }
-        rowHoverable={false}
         bordered
         loading={loading}
       />
