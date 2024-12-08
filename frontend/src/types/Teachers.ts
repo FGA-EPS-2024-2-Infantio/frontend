@@ -3,6 +3,7 @@ export type CreateTeacherType = {
   numberOfClasses: number
   cpf: string
   startDate: Date;
+  schoolId: string;
 }
 
 export type TeacherResponseDto = {
@@ -12,4 +13,5 @@ export type TeacherResponseDto = {
   cpf: string
   startDate: Date;
   createdAt: Date
+  schoolId: string;
 }

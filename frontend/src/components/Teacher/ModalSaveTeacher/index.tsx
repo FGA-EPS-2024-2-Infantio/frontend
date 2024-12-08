@@ -1,26 +1,11 @@
-'use client'
-
-import { createTeacher, fetchTeacherById, fetchTeachers, updateTeacher } from '@/store/slices/teacherSlice'
+import { createTeacher, fetchTeacherById, fetchTeachers, updateTeacher, fetchSchools } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { CreateTeacherType, TeacherResponseDto } from '@/types/Teachers'
-import { Button, DatePicker, Form, Input, InputNumber, Modal } from 'antd'
-import { useEffect } from 'react'
+import { Button, DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
-import advancedFormat from 'dayjs/plugin/advancedFormat'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import localeData from 'dayjs/plugin/localeData'
-import weekday from 'dayjs/plugin/weekday'
-import weekOfYear from 'dayjs/plugin/weekOfYear'
-import weekYear from 'dayjs/plugin/weekYear'
-
-dayjs.extend(customParseFormat)
-dayjs.extend(advancedFormat)
-dayjs.extend(weekday)
-dayjs.extend(localeData)
-dayjs.extend(weekOfYear)
-dayjs.extend(weekYear)
 
 type Props = {
   isModalOpen: boolean
@@ -35,33 +20,51 @@ export default function ModalSaveTeacher({
 }: Props) {
   const [form] = Form.useForm<CreateTeacherType>()
   const dispatch = useDispatch<AppDispatch>()
-  const { loading } = useSelector((state: RootState) => state.teacher)
+  const { loading, schools } = useSelector((state: RootState) => state.teacher)
+  const [schoolOptions, setSchoolOptions] = useState<{ value: number, label: string }[]>([])
 
-  form.setFieldValue("startDate", dayjs(form.getFieldValue("startDate")))
-
-  const handleCancel = () => {
-    // form.resetFields()
-    setIsModalOpen(false)
-  }
-
+  // Atualizar os campos apenas quando teacherToEdit estiver disponível
   useEffect(() => {
     if (teacherToEdit) {
       form.setFieldsValue({
         name: teacherToEdit.name,
         numberOfClasses: teacherToEdit.numberOfClasses,
         cpf: teacherToEdit.cpf,
-        startDate: dayjs(teacherToEdit.startDate) // Certifique-se de usar `moment`
-      })
+        startDate: dayjs(teacherToEdit.startDate),
+        schoolId: teacherToEdit.schoolId,
+      });
     }
-  }, [teacherToEdit, form])
+  }, [teacherToEdit, form]);
+
+  // Requisição para buscar escolas
+  useEffect(() => {
+    if (schools.length === 0) {
+      dispatch(fetchSchools())
+    }
+  }, [dispatch, schools]);
+
+  // Atualiza as opções do Select sempre que o estado de schools for alterado
+  useEffect(() => {
+    if (schools.length > 0) {
+      const options = schools.map((school) => ({
+        value: school.id, 
+        label: school.name
+      }));
+      setSchoolOptions(options);
+    }
+  }, [schools]);
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
 
   const handleSaveTeacher = async () => {
     try {
       const values = await form.validateFields()
 
-      // Converte `startDate` para `Date` ao salvar
       const teacherData: CreateTeacherType = {
-        ...values
+        ...values,
+        schoolId: values.schoolId,
       };
 
       if (teacherToEdit) {
@@ -109,7 +112,7 @@ export default function ModalSaveTeacher({
       destroyOnClose={true}
     >
       <Form
-        form={form}
+        form={form}  // Passando a instância do form aqui
         layout="vertical"
         onFinish={handleSaveTeacher}
         className="space-y-4"
@@ -156,8 +159,19 @@ export default function ModalSaveTeacher({
             className="w-full"
             placeholder="Data de Início"
             format="DD/MM/YYYY"
-            value={form.getFieldValue("startDate")} // Certifique-se de que o valor seja `moment`
-            onChange={(date) => form.setFieldValue('startDate', date)} // Converte para `Date`
+            value={form.getFieldValue("startDate")} 
+            onChange={(date) => form.setFieldValue('startDate', date)} 
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="schoolId"
+          label="Selecione a Escola"
+          rules={[{ required: true, message: 'Por favor, selecione a escola' }]}
+        >
+          <Select
+            placeholder="Selecione a Escola"
+            options={schoolOptions} 
           />
         </Form.Item>
 
