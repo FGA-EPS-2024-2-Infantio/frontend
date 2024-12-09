@@ -43,7 +43,7 @@ export default function FormularioMatricula() {
   const [observacoes, setObservacoes] = useState<Observacao[]>([]);
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
   const [form] = Form.useForm();
-
+  
   interface FormValues {
     aceiteResponsabilidade: boolean;
     autorizacaoImagens: boolean;
