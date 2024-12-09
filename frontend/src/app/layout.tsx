@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import localFont from 'next/font/local'
 import 'react-toastify/dist/ReactToastify.css'
-import { authOptions } from './api/auth/[...nextauth]/route'
 import './globals.css'
+import { authOptions } from './utils/authOptions'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',

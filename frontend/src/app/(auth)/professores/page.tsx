@@ -1,19 +1,17 @@
 'use client'
 
 import ModalSaveTeacher from '@/components/Teacher/ModalSaveTeacher'
+import axiosInstance from '@/config/AxiosInstance'
 import { fetchTeachers } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { TeacherResponseDto } from '@/types/Teachers'
-import { SchoolResponseDto } from '@/types/Schools'
-import { Table, Button } from 'antd'
+import { Button, Table } from 'antd'
 import classNames from 'classnames'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import axios from 'axios'
-import axiosInstance from '@/config/AxiosInstance'
 
 export default function Teachers() {
   const router = useRouter()
@@ -34,7 +32,7 @@ export default function Teachers() {
   }, [error])
 
   // Função para buscar o nome da escola
-  const fetchSchoolName = async (schoolId: number) => {
+  const fetchSchoolName = async (schoolId: string) => {
     try {
       const response = await axiosInstance.get(`/schools/${schoolId}`)
 
@@ -48,7 +46,7 @@ export default function Teachers() {
   // Atualizando o estado dos nomes das escolas
   useEffect(() => {
     const loadSchoolNames = async () => {
-      const schoolNames: { [id: number]: string } = {}
+      const schoolNames: { [id: string]: string } = {}
       for (const teacher of teachers) {
         if (!schoolNames[teacher.schoolId]) {
           const schoolName = await fetchSchoolName(teacher.schoolId)
@@ -97,7 +95,8 @@ export default function Teachers() {
     numberOfClasses: teacher.numberOfClasses,
     cpf: teacher.cpf,
     startDate: teacher.startDate,
-    schoolId: teacher.schoolId
+    schoolId: teacher.schoolId,
+    createdAt: teacher.createdAt,
   }))
 
   const [isModalOpen, setIsModalOpen] = useState(false)

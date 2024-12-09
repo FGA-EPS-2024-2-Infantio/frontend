@@ -1,16 +1,16 @@
 'use client'
-import { updateStudent, fetchStudentById } from '@/store/slices/studentSlice';
+import { fetchStudentById, updateStudent } from '@/store/slices/studentSlice';
+import { AppDispatch, RootState } from '@/store/store';
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Radio, Table, Spin, FormInstance } from 'antd';
+import { Button, Checkbox, Form, Input, Radio, Spin, Table } from 'antd';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import InputMask from 'react-input-mask';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import ModalObservacao from '../../../components/Matricula/ModalObservacao/index';
 import ModalResponsavel from '../../../components/Matricula/ModalResponsavel';
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/store/store'
-import { toast } from 'react-toastify'
 
 // Tipo para observações
 type Observacao = {

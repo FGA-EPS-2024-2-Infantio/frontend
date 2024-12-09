@@ -1,7 +1,7 @@
 import Sidebar from '@/components/Sidebar'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import { authOptions } from '../api/auth/[...nextauth]/route'
+import { authOptions } from '../utils/authOptions'
 
 type Props = {
   children: React.ReactNode
