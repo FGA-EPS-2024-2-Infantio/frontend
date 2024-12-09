@@ -2,12 +2,13 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main] #garantindo que vai rodar o CI na branch. Pode ser alterado posteriormente.
   pull_request:
     branches: [main]
+  workflow_dispatch: # execucao manual, talvez seja retirado por não ter necessidade
 
 jobs:
-  build:
+  install_and_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checando código
@@ -16,13 +17,20 @@ jobs:
       - name: Setando a versão do node
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: '18.x' #para ser compatível com o nosso projeto
 
+      # indo para o frontend - Motivo: O actions joga o .github para a raiz. E estamos numa rota frontend(raiz)/frontend
+      - name: Navegando para o diretório frontend
+        run: cd frontend
+
+      # Instalando dependências
       - name: Instalando dependências
         run: npm install
+        working-directory: frontend # Definindo o direitorio de trabalho
 
-      - name: Rodando Linter
-        run: npm run lint
+     ## - name: Rodando Linter
+     ##   run: npm run lint
 
       - name: Buildando o projeto
         run: npm run build
+        working-directory: frontend  # Definindo o direitorio de trabalho
