@@ -1,6 +1,6 @@
 "use client"
 
-import { createAttendance, fetchAttendanceByDate, updateAttendance } from "@/store/slices/attendanceSlice";
+import { createAttendance, fetchAttendanceByDateAndClass, updateAttendance } from "@/store/slices/attendanceSlice";
 import { fetchStudents } from "@/store/slices/studentSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
@@ -9,6 +9,7 @@ import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Page = () => {
   const { classId, attendanceDate } = useParams();
@@ -21,13 +22,13 @@ const Page = () => {
   const attendancesByDate = useSelector((state: RootState) => state.attendence.attendancesByDate);
   
   useEffect(() => {
-    // Carregar alunos e presenças
-    dispatch(fetchStudents());
-    if (attendanceDate) {
+    if (attendanceDate && classId) {
       const decodedDate = decodeURIComponent(attendanceDate);
-      dispatch(fetchAttendanceByDate(decodedDate)); // Carregar as presenças
+      console.log("decoded", decodedDate);
+      console.log("id", classId);
+      dispatch(fetchAttendanceByDateAndClass({ date: decodedDate, classId: classId }));
     }
-  }, [dispatch, attendanceDate]);
+  }, [dispatch, attendanceDate, classId]);
 
   useEffect(() => {
     // Atualizar lista de alunos quando a lista de estudantes ou presenças mudar
@@ -114,7 +115,11 @@ const Page = () => {
 
   const onFinish: FormProps<FieldType>['onFinish'] = async () => {
     console.log('Success: ', studentList);
-    dispatch(updateAttendance({ data: studentList }));
+    dispatch(updateAttendance({ data: studentList })).unwrap()
+    .then(() => {
+      toast.success('Alterações salvas com sucesso')
+    })
+    .catch();;
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {

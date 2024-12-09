@@ -7,9 +7,10 @@ import { CreateAttendanceType } from "@/types/Attendances";
 import { StudentsResponseDTO } from "@/types/Students";
 import { Button, Checkbox, DatePicker, Divider, Form, FormProps, Radio, Spin, Table, TableColumnsType, TableProps } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const Page = () => {
   const { classId } = useParams();
@@ -17,6 +18,8 @@ const Page = () => {
   const classIdStr = Array.isArray(classId) ? classId[0] : classId
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const router = useRouter();
+
 
   const handleDateChange = (date: Date) => {
 
@@ -88,7 +91,12 @@ const Page = () => {
 
     console.log("lista", updatedStudentList)
 
-    await dispatch(createAttendance(updatedStudentList));
+    await dispatch(createAttendance(updatedStudentList)).unwrap()
+    .then(() => {
+      toast.success('Chamada criada com sucesso')
+      router.push(`/turmas/${classId}`);
+    })
+    .catch();
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {

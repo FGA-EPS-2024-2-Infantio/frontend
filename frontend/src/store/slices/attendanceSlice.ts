@@ -35,10 +35,10 @@ const getAxiosErrorMessage = (error: unknown, defaultMessage: string) => {
   return defaultMessage
 }
 
-export const fetchAttendances = createAsyncThunk(
+export const fetchAttendancesByClass = createAsyncThunk(
   'attendances/fetchAttendances',
-  async () => {
-    const response = await axiosInstance.get('/attendances')
+  async (classId: string, { rejectWithValue }) => {
+    const response = await axiosInstance.get(`/attendances/class/${classId}`)
     return response.data
   }
 )
@@ -57,12 +57,12 @@ export const fetchAttendanceById = createAsyncThunk(
   }
 )
 
-export const fetchAttendanceByDate = createAsyncThunk(
+export const fetchAttendanceByDateAndClass = createAsyncThunk(
   'attendances/fetchAttendanceByDate',
-  async (date: string, { rejectWithValue }) => {
-    try {
-      console.log(date)
-      const response = await axiosInstance.get(`/attendances/date/${date}`)
+  async ({ date, classId }: { date: string; classId: string }, { rejectWithValue }) => {   
+     try {
+      console.log("aqui",date)
+      const response = await axiosInstance.get(`/attendances/date/${date}/class/${classId}`)
       return response.data
     } catch (error) {
       return rejectWithValue(
@@ -120,12 +120,12 @@ const attendanceSlice = createSlice({
       })
 
       // List Attendances
-      .addCase(fetchAttendances.pending, state => setLoadingAndError(state, true))
-      .addCase(fetchAttendances.fulfilled, (state, action) => {
+      .addCase(fetchAttendancesByClass.pending, state => setLoadingAndError(state, true))
+      .addCase(fetchAttendancesByClass.fulfilled, (state, action) => {
         setLoadingAndError(state, false)
         state.attendances = action.payload
       })
-      .addCase(fetchAttendances.rejected, (state, action) => {
+      .addCase(fetchAttendancesByClass.rejected, (state, action) => {
         setLoadingAndError(
           state,
           false,
@@ -168,10 +168,10 @@ const attendanceSlice = createSlice({
       })
 
       //Fetch attendance By date
-      .addCase(fetchAttendanceByDate.pending, (state) => {
+      .addCase(fetchAttendanceByDateAndClass.pending, (state) => {
         setLoadingAndError(state, true);
       })
-      .addCase(fetchAttendanceByDate.fulfilled, (state, action) => {
+      .addCase(fetchAttendanceByDateAndClass.fulfilled, (state, action) => {
         console.log('Payload recebido no fulfilled:', action.payload); 
         console.log('Estado antes da atualização:', state.attendancesByDate); 
         
@@ -180,7 +180,7 @@ const attendanceSlice = createSlice({
         
         console.log('Estado após a atualização:', state.attendancesByDate);
       })
-      .addCase(fetchAttendanceByDate.rejected, (state, action) => {
+      .addCase(fetchAttendanceByDateAndClass.rejected, (state, action) => {
         setLoadingAndError(state, false, action.payload as string);
       });
   }

@@ -1,6 +1,6 @@
 'use client'
 import ModalSaveClass from '@/components/Class/ModalSaveClass'
-import { fetchAttendances } from '@/store/slices/attendanceSlice'
+import { fetchAttendancesByClass } from '@/store/slices/attendanceSlice'
 import {
   deleteClassById,
   fetchClassById,
@@ -46,7 +46,7 @@ export default function ClassDetails() {
   const router = useRouter()
 
   useEffect(() => {
-    dispatch(fetchAttendances())
+    dispatch(fetchAttendancesByClass(classId))
   }, [dispatch])
 
   useEffect(() => {
@@ -143,6 +143,8 @@ export default function ClassDetails() {
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const attendanceId = event.currentTarget.id;
     const attendanceDate = event.currentTarget.getAttribute('data-id');
+    console.log("data",attendanceDate);
+    console.log("id",attendanceId);
 
     if (attendanceDate && attendanceId) {
       router.push(`${classId}/chamada/${attendanceDate}/${attendanceId}`);
