@@ -42,11 +42,11 @@ export default function Sidebar({ session }: Props) {
 
   const items: MenuItem[] = [
     session.user.role === 'ADMIN' && getItem('Escolas', '1', <HomeOutlined />),
-    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+    (session.user.role === 'DIRECTOR') &&
       getItem('Alunos', '2', <UserOutlined />),
-    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+    (session.user.role === 'DIRECTOR') &&
       getItem('Professores', '3', <TeamOutlined />),
-    (session.user.role === 'DIRECTOR' || session.user.role === 'ADMIN') &&
+    (session.user.role === 'DIRECTOR') &&
       getItem('Turmas', '4', <BookOutlined />),
     getItem('Perfil', '5', <UserOutlined />)
   ].filter(Boolean) as MenuItem[]
