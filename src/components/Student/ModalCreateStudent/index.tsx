@@ -1,10 +1,10 @@
 'use client'
 
-import { createStudent, fetchStudents, updateStudent } from '@/store/slices/studentSlice'
+import { createStudent, fetchSchools, fetchStudents, updateStudent } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { CategorieType, ClassType, StudentDTO, StudentsResponseDTO, TurnType } from '@/types/Students'
 import { Button, Form, Input, Modal, Select } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
@@ -62,6 +62,9 @@ export default function ModalCreateStudent({
   studentToEdit
 }: Props) {
   const [form] = Form.useForm<StudentDTO>()
+  const dispatch = useDispatch<AppDispatch>()
+  const [schoolOptions, setSchoolOptions] = useState<{ value: number, label: string }[]>([])
+  const { loading, schools } = useSelector((state: RootState) => state.student)
 
   const handleCancel = () => {
     form.resetFields()
@@ -74,13 +77,33 @@ export default function ModalCreateStudent({
         name: studentToEdit.name,
         class: studentToEdit.class,
         categorie: studentToEdit.categorie,
-        turn: studentToEdit.turn
+        turn: studentToEdit.turn,
+        schoolId: studentToEdit.schoolId,
       })
     }
   }, [studentToEdit, form])
 
-  const dispatch = useDispatch<AppDispatch>()
-  const { loading } = useSelector((state: RootState) => state.student)
+  // Requisição para buscar escolas
+  useEffect(() => {
+    if (schools.length === 0) {
+      dispatch(fetchSchools())
+    }
+  }, [dispatch, schools]);
+
+  // Atualiza as opções do Select sempre que o estado de schools for alterado
+  useEffect(() => {
+    if (schools.length > 0) {
+      const options = schools.map((school) => ({
+        value: school.id, 
+        label: school.name
+      }));
+      setSchoolOptions(options);
+      
+
+    }
+  }, [schools]);
+
+
 
   const handleCreateStudent = async () => {
     try {
@@ -169,6 +192,17 @@ export default function ModalCreateStudent({
         >
           <Select placeholder='Turma do Aluno'
             options={classType}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="schoolId"
+          label="Selecione a Escola"
+          rules={[{ required: true, message: 'Por favor, selecione a escola' }]}
+        >
+          <Select
+            placeholder="Selecione a Escola"
+            options={schoolOptions} 
           />
         </Form.Item>
 
