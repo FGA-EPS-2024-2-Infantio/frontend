@@ -23,12 +23,12 @@ export default function Teachers() {
     dispatch(fetchTeachers())
   }, [dispatch])
 
-  useEffect(() => {
-    if (error) {
-      console.log("erro",error)
-      toast.error(error)
-    }
-  }, [error])
+  // useEffect(() => {
+  //   if (error) {
+  //     console.log("erro",error)
+  //     toast.error(error)
+  //   }
+  // }, [error])
 
   const columns: TableProps<TeacherResponseDto>['columns'] = [
     {
