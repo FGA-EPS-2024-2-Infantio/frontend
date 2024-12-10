@@ -3,9 +3,15 @@ import { StudentDTO, StudentsResponseDTO } from '@/types/Students'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+
+type School = {
+  id: number
+  name: string
+}
 interface StudentState {
   loading: boolean
   error: string | null
+  schools: School[]
   students: StudentsResponseDTO[]
   student: StudentsResponseDTO | null
 }
@@ -14,8 +20,11 @@ const initialState: StudentState = {
   loading: false,
   error: null,
   students: [],
+  schools: [],
   student: null
 }
+
+
 
 const getAxiosErrorMessage = (error: unknown, defaultMessage: string) => {
   if (axios.isAxiosError(error) && error.response?.data) {
@@ -23,6 +32,14 @@ const getAxiosErrorMessage = (error: unknown, defaultMessage: string) => {
   }
   return defaultMessage
 }
+
+export const fetchSchools = createAsyncThunk(
+  'students/fetchSchools',
+  async () => {
+    const response = await axiosInstance.get('/schools')
+    return response.data
+  }
+)
 
 
 export const fetchStudents = createAsyncThunk(
@@ -180,6 +197,19 @@ const studentSlice = createSlice({
       .addCase(updateStudent.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || 'Erro ao atualizar estudante'
+      })
+
+      //Fetch Schools
+      .addCase(fetchSchools.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(fetchSchools.fulfilled, (state, action) => {
+        state.schools = action.payload;
+      })
+      
+      .addCase(fetchSchools.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || 'Erro ao buscar escolas'
       })
 
   }
