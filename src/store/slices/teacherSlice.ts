@@ -1,8 +1,8 @@
 import axiosInstance from '@/config/AxiosInstance'
+import { ClassResponseDto } from '@/types/Classes'
 import { CreateTeacherType, TeacherResponseDto } from '@/types/Teachers'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-
 
 type School = {
   id: number
@@ -15,6 +15,7 @@ interface TeacherState {
   schools: School[]
   teachers: TeacherResponseDto[]
   teacher: TeacherResponseDto | null
+  teacherClasses: ClassResponseDto[]
 }
 
 const initialState: TeacherState = {
@@ -22,7 +23,8 @@ const initialState: TeacherState = {
   error: null,
   schools: [],
   teachers: [],
-  teacher: null
+  teacher: null,
+  teacherClasses: []
 }
 
 
@@ -117,6 +119,18 @@ export const updateTeacher = createAsyncThunk(
   }
 )
 
+export const fetchTeacherClasses = createAsyncThunk(
+  'teachers/fetchTeacherClasses',
+  async (teacherId: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/teachers/${teacherId}/classes`)
+      return response.data
+    } catch {
+      return rejectWithValue('Erro ao buscar turmas do professor')
+    }
+  }
+)
+
 const teacherSlice = createSlice({
   name: 'teachers',
   initialState,
@@ -192,6 +206,17 @@ const teacherSlice = createSlice({
         }
       })
       .addCase(updateTeacher.rejected, (state, action) => {
+        setLoadingAndError(state, false, action.payload as string)
+      })
+
+      .addCase(fetchTeacherClasses.pending, state => {
+        setLoadingAndError(state, true)
+      })
+      .addCase(fetchTeacherClasses.fulfilled, (state, action) => {
+        setLoadingAndError(state, false)
+        state.teacherClasses = action.payload // Aqui atualizamos o estado com as turmas obtidas
+      })
+      .addCase(fetchTeacherClasses.rejected, (state, action) => {
         setLoadingAndError(state, false, action.payload as string)
       })
       //Fetch Schools

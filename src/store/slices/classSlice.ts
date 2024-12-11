@@ -7,18 +7,41 @@ import {
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+interface TeacherData {
+  id: string
+  name: string
+}
+
+interface Student {
+  id: string
+  name: string
+}
+
+interface ClassData {
+  id: string
+  name: string
+  teacher: TeacherData
+  disabled: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 interface ClassState {
   loading: boolean
   error: string | null
   classes: ClassResponseDto[]
   classObj: ClassResponseDto | null
+  classData: ClassData | null
+  students: Student[]
 }
 
 const initialState: ClassState = {
   loading: false,
   error: null,
   classes: [],
-  classObj: null
+  classObj: null,
+  classData: null,
+  students: []
 }
 
 const setLoadingAndError = (
@@ -125,6 +148,19 @@ export const updateClass = createAsyncThunk(
   }
 )
 
+export const fetchClassDetails = createAsyncThunk(
+  'class/fetchClassDetails',
+  async (classId: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/classes/${classId}`)
+      console.log(response.data)
+      return response.data
+    } catch {
+      return rejectWithValue('Erro ao buscar detalhes da turma')
+    }
+  }
+)
+
 const classSlice = createSlice({
   name: 'classes',
   initialState,
@@ -208,6 +244,23 @@ const classSlice = createSlice({
         state.classObj = action.payload
       })
       .addCase(updateClassStudents.rejected, (state, action) => {
+        setLoadingAndError(state, false, action.payload as string)
+      })
+      .addCase(fetchClassDetails.pending, state => setLoadingAndError(state, true))
+      .addCase(fetchClassDetails.fulfilled, (state, action) => {
+        setLoadingAndError(state, false)
+        const { id, name, teacher, students, disabled, createdAt, updatedAt } = action.payload
+        state.classData = {
+          id,
+          name,
+          teacher,
+          disabled,
+          createdAt,
+          updatedAt
+        }
+        state.students = students
+      })
+      .addCase(fetchClassDetails.rejected, (state, action) => {
         setLoadingAndError(state, false, action.payload as string)
       })
   }
