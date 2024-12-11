@@ -151,8 +151,8 @@ const studentSlice = createSlice({
         state.error = null
       })
       .addCase(fetchStudentById.fulfilled, (state, action) => {
-        state.loading = false
         state.student = action.payload
+        state.loading = false
       })
       .addCase(fetchStudentById.rejected, (state, action) => {
         state.loading = false

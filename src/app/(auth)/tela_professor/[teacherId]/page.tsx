@@ -1,13 +1,13 @@
 'use client'
 
-import { useParams } from 'next/navigation'
-import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { AppDispatch, RootState } from '@/store/store'
 import { fetchTeacherClasses } from '@/store/slices/teacherSlice'
-import { Table, Spin } from 'antd'
+import { AppDispatch, RootState } from '@/store/store'
+import { Spin, Table } from 'antd'
+import classNames from 'classnames'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/navigation'
 
 export default function TurmasDoProfessor() {
   const { teacherId } = useParams()
@@ -71,6 +71,9 @@ export default function TurmasDoProfessor() {
         dataSource={teacherClasses}
         rowKey='id'
         bordered
+        rowClassName={() =>
+          classNames('cursor-pointer hover:bg-gray-100 transition duration-200')
+        }
         onRow={record => ({
           onClick: () => handleRowClick(record)
         })}

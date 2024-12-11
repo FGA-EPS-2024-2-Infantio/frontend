@@ -31,13 +31,6 @@ function getItem(
   } as MenuItem
 }
 
-const items: MenuItem[] = [
-  getItem('Escolas', '1', <HomeOutlined />),
-  getItem('Alunos', '2', <UserOutlined />),
-  getItem('Professores', '3', <UserOutlined />),
-  getItem('Turmas', '4', <BookOutlined />),
-  getItem('Tela do Professor', '5', <BookOutlined />),
-]
 type Props = {
   session: Session // "ADMIN" | "TEACHER" | "DIRECTOR" | "USER"
 }
@@ -55,7 +48,9 @@ export default function Sidebar({ session }: Props) {
       getItem('Professores', '3', <TeamOutlined />),
     (session.user.role === 'DIRECTOR') &&
       getItem('Turmas', '4', <BookOutlined />),
-    getItem('Perfil', '5', <UserOutlined />)
+    (session.user.role === 'TEACHER') &&
+      getItem('Turmas do professor', '5', <BookOutlined />),
+    getItem('Perfil', '6', <UserOutlined />)
   ].filter(Boolean) as MenuItem[]
 
   const handleMenuClick: MenuProps['onClick'] = e => {
@@ -72,10 +67,10 @@ export default function Sidebar({ session }: Props) {
       router.push('/turmas')
     }
     if (e.key === '5') {
-      router.push(`/perfil/${session?.user.id}`)
+      router.push('/tela_professor')
     }
     if (e.key === '6') {
-      router.push('/tela_professor')
+      router.push(`/perfil/${session?.user.id}`)
     }
   }
 

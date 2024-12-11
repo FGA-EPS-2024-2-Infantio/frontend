@@ -86,3 +86,35 @@ export enum TurnType {
     MATUTINO = "MATUTINO",
     VESPERTINO = "VESPERTINO" 
 }
+
+export type Mae = {
+    name: string;
+    phone: string;
+    rg: string;
+    cpf: string;
+    naturalidade: string;
+}
+
+export type Pai = {
+    name: string;
+    phone: string;
+    rg: string;
+    cpf: string;
+    naturalidade: string;
+}
+
+export type Responsaveis = {
+    name: string;
+    parentesco: string;
+    phone: string;
+}
+
+export type ObservacoesMedicas = {
+    hospital: string;
+    hospitalPhone: string;
+    doctor: string;
+    doctorPhone: string;
+    endereco: string;
+    convenio: boolean;
+    observacoes: string;
+}
