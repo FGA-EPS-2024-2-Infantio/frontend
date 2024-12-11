@@ -37,7 +37,7 @@ const getAxiosErrorMessage = (error: unknown, defaultMessage: string) => {
 
 export const fetchAttendancesByClass = createAsyncThunk(
   'attendances/fetchAttendances',
-  async (classId: string, { rejectWithValue }) => {
+  async (classId: string) => {
     const response = await axiosInstance.get(`/attendances/class/${classId}`)
     return response.data
   }

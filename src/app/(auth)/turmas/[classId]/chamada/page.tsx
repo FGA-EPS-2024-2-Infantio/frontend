@@ -4,10 +4,9 @@ import { createAttendance } from "@/store/slices/attendanceSlice";
 import { fetchStudents } from "@/store/slices/studentSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
-import { StudentsResponseDTO } from "@/types/Students";
-import { Button, Checkbox, DatePicker, Divider, Form, FormProps, Radio, Spin, Table, TableColumnsType, TableProps } from "antd";
+import { Button, Checkbox, DatePicker, Divider, Form, FormProps, Spin, Table, TableProps } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -30,7 +29,7 @@ const Page = () => {
 
   const dispatch = useDispatch<AppDispatch>()
 
-  const { loading, error, classObj } = useSelector(
+  const { classObj } = useSelector(
     (state: RootState) => state.class
   )
 
@@ -83,7 +82,7 @@ const Page = () => {
     remember?: string;
   };
 
-  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+  const onFinish: FormProps<FieldType>['onFinish'] = async () => {
     const updatedStudentList = studentList.map(student => ({
       ...student,
       date: selectedDate,

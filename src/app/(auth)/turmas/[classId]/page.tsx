@@ -8,7 +8,7 @@ import {
 } from '@/store/slices/classSlice'
 import { fetchStudents } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
-import { AttendanceResponseDto, CreateAttendanceType } from '@/types/Attendances'
+import { AttendanceResponseDto } from '@/types/Attendances'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Select, Spin } from 'antd'
 import { useParams, useRouter } from 'next/navigation'
@@ -16,7 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
-export default function ClassDetails() {
+export default function ClassDetails({params}: {params: {classId: string}}) {
   const { classId } = useParams()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error, classObj } = useSelector(
@@ -24,7 +24,7 @@ export default function ClassDetails() {
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
-  const classIdStr = Array.isArray(classId) ? classId[0] : classId
+  // const classIdStr = Array.isArray(classId) ? classId[0] : classId // Se der BO
 
   const { students, error: errorStudents } = useSelector(
     (state: RootState) => state.student
@@ -46,8 +46,8 @@ export default function ClassDetails() {
   const router = useRouter()
 
   useEffect(() => {
-    dispatch(fetchAttendancesByClass(classId))
-  }, [dispatch])
+    dispatch(fetchAttendancesByClass(params.classId))
+  }, [dispatch, params.classId])
 
   useEffect(() => {
     dispatch(fetchStudents())
@@ -68,10 +68,10 @@ export default function ClassDetails() {
   }, [errorStudents])
 
   useEffect(() => {
-    if (classIdStr) {
-      dispatch(fetchClassById(classIdStr))
+    if (params.classId) {
+      dispatch(fetchClassById(params.classId))
     }
-  }, [dispatch, classIdStr])
+  }, [dispatch, params.classId])
 
   useEffect(() => {
     if (error) {
@@ -90,34 +90,34 @@ export default function ClassDetails() {
   const handleUpdateStudents = () => {
     dispatch(
       updateClassStudents({
-        id: classIdStr,
+        id: params.classId,
         data: { studentIds: selectedStudents }
       })
     )
       .unwrap()
       .then(() => {
         toast.success('Alunos atualizados com sucesso!')
-        dispatch(fetchClassById(classIdStr))
+        dispatch(fetchClassById(params.classId))
       })
       .catch(error => toast.error(`Erro: ${error.message}`))
   }
 
   const handleDeactivateClass = useCallback(() => {
-    dispatch(deleteClassById(classIdStr))
+    dispatch(deleteClassById(params.classId))
       .unwrap()
       .then(() => {
         toast.success('Turma desativada com sucesso')
-        dispatch(fetchClassById(classIdStr))
+        dispatch(fetchClassById(params.classId))
       })
       .catch(error => toast.error(`Erro: ${error.message}`))
-  }, [dispatch, classIdStr])
+  }, [dispatch, params.classId])
 
   const actionMenuItems = useMemo(() => {
     const items = []
 
     items.push({
       key: 'editClass',
-      label: <span onClick={() => setIsModalOpen(true)}>Editar escola</span>
+      label: <span onClick={() => setIsModalOpen(true)}>Editar turma</span>
     })
 
     if (!classObj?.disabled) {

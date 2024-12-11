@@ -55,7 +55,8 @@ export default function Students() {
     class: student.class,
     turn: student.turn,
     categorie: student.categorie,
-    disabled: student.disabled
+    disabled: student.disabled,
+    schoolId: student.schoolId,
   }))
 
   const [isModalOpen, setIsModalOpen] = useState(false)

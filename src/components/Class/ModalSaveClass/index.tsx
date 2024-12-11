@@ -68,7 +68,7 @@ export default function ModalSaveClass({
         const action = await dispatch(
           updateClass({
             id: classToEdit.id,
-            data: values
+            data: {...values, userId: session.data?.user.id ?? ""}
           })
         )
 

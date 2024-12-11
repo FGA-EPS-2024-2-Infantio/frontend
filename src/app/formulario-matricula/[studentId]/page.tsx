@@ -142,10 +142,7 @@ export default function FormularioMatricula() {
   const handleDeleteResponsavel = (key: string) => {
     setResponsaveis((prev) => prev.filter((item) => item.key !== key));
   };
-
   
-  
-
   // Envio do formulário
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = () => {
@@ -156,6 +153,7 @@ export default function FormularioMatricula() {
         const updatedData = form.getFieldsValue();
         const studentData = {
           name: student?.name,
+          schoolId: student?.schoolId ?? "",
           isFilled: true,
           categorie: student?.categorie,
           class:student?.class,
