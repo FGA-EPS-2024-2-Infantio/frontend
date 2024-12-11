@@ -85,7 +85,9 @@ export default function ClassDetails({params}: {params: {classId: string}}) {
     }
   }, [classObj])
 
-
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
+    console.log(event.key);
+  }
 
   const handleUpdateStudents = () => {
     dispatch(
@@ -117,7 +119,7 @@ export default function ClassDetails({params}: {params: {classId: string}}) {
 
     items.push({
       key: 'editClass',
-      label: <span onClick={() => setIsModalOpen(true)}>Editar turma</span>
+      label: <span onKeyDown={handleKeyDown} onClick={() => setIsModalOpen(true)}>Editar turma</span>
     })
 
     if (!classObj?.disabled) {
@@ -253,6 +255,7 @@ export default function ClassDetails({params}: {params: {classId: string}}) {
             {filteredAttendances.map(attendance => (
               <div
                 onClick={handleClick}
+                onKeyDown={handleKeyDown}
                 key={attendance.id}
                 id={attendance.id}
                 data-id={attendance.date ? new Date(attendance.date).toISOString().split('T')[0] : ''}
