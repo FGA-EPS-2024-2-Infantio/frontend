@@ -57,7 +57,6 @@ export default function Students() {
     turn: student.turn,
     categorie: student.categorie,
     disabled: student.disabled,
-    schoolId: student.schoolId,
     payments: student.payments
   }))
 
