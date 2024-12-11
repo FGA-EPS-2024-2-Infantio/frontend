@@ -5,7 +5,6 @@ import { fetchStudentById } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { MonthlyPaymentDto, MonthlyPaymentResponseDto } from '@/types/Payment'
 import { Button, DatePicker, Form, InputNumber, Modal, Switch } from 'antd'
-import dayjs from 'dayjs'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -36,7 +35,9 @@ export default function ModalCreatePayment({
   useEffect(() => {
     if (isModalOpen && monthlyPaymentToEdit) {
       form.setFieldsValue({
-        date: dayjs(`${monthlyPaymentToEdit.year}-${monthlyPaymentToEdit.month}-05`),
+        studentId: monthlyPaymentToEdit.studentId,
+        month: monthlyPaymentToEdit.month,
+        year: monthlyPaymentToEdit.year,
         payed: monthlyPaymentToEdit.payed,
         value: monthlyPaymentToEdit.value,
       })
@@ -46,6 +47,7 @@ export default function ModalCreatePayment({
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.payment)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCreatePayment = async (values: any) => {
     try {
       const { date, ...rest } =  values

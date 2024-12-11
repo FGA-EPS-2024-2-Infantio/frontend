@@ -1,11 +1,11 @@
 'use client'
 
 
-import { MonthlyPaymentDto, MonthlyPaymentResponseDto } from '@/types/Payment'
+import { MonthlyPaymentResponseDto } from '@/types/Payment'
 import { Button, Table, TableProps } from 'antd'
+import classNames from 'classnames'
 import { useState } from 'react'
 import ModalCreatePayment from './ModalCreatePayment'
-import classNames from 'classnames'
 
 type Props = {
   loading: boolean

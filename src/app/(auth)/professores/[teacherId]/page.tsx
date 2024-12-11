@@ -1,12 +1,12 @@
 'use client'
 import ModalSaveTeacher from '@/components/Teacher/ModalSaveTeacher'
-import { fetchTeacherById } from '@/store/slices/teacherSlice'
+import { disableTeacherById, fetchTeacherById } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { ChevronDown } from '@untitled-ui/icons-react'
-import { Button, Dropdown, Spin } from 'antd'
+import { Button, Dropdown, Popconfirm, Spin } from 'antd'
 import { useSession } from 'next-auth/react'
-import { useParams } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
@@ -18,6 +18,8 @@ export default function TeacherDetails() {
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
   const teacherIdStr = Array.isArray(teacherId) ? teacherId[0] : teacherId
+
+  const router = useRouter();
 
   useEffect(() => {
     if (teacherIdStr) {
@@ -31,15 +33,15 @@ export default function TeacherDetails() {
     }
   }, [error])
 
-  // const handleDeleteTeacher = useCallback(() => {
-  //   dispatch(deleteTeacherById(teacherIdStr))
-  //     .unwrap()
-  //     .then(() => {
-  //       toast.success('Professor deletado com sucesso')
-  //       router.push('/professores')
-  //     })
-  //     .catch(error => toast.error(`Erro: ${error.message}`))
-  // }, [dispatch, teacherIdStr, router])
+  const handleDisableTeacher = useCallback(() => {
+    dispatch(disableTeacherById(teacherIdStr))
+      .unwrap()
+      .then(() => {
+        toast.success('Professor desabilitado com sucesso')
+        router.push('/professores')
+      })
+      .catch();
+  }, [dispatch, teacherIdStr, router])
 
   const actionMenuItems = useMemo(() => {
     const items = []
@@ -49,23 +51,23 @@ export default function TeacherDetails() {
       label: <span onClick={() => setIsModalOpen(true)}>Editar professor</span>
     })
 
-    // items.push({
-    //   key: 'deleteTeacher',
-    //   label: (
-    //     <Popconfirm
-    //       title='Tem certeza que deseja deletar este professor?'
-    //       onConfirm={handleDeleteTeacher}
-    //       okText='Sim'
-    //       cancelText='Não'
-    //       placement='bottom'
-    //     >
-    //       <span>Deletar professor</span>
-    //     </Popconfirm>
-    //   )
-    // })
+    items.push({
+      key: 'deleteTeacher',
+      label: (
+        <Popconfirm
+          title='Tem certeza que deseja desativar este professor?'
+          onConfirm={handleDisableTeacher}
+          okText='Sim'
+          cancelText='Não'
+          placement='bottom'
+        >
+          <span>Desativar professor</span>
+        </Popconfirm>
+      )
+    })
 
     return items
-  }, [])
+  }, [handleDisableTeacher])
 
   const session = useSession()
 
@@ -113,3 +115,4 @@ export default function TeacherDetails() {
     </div>
   )
 }
+

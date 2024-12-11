@@ -15,5 +15,6 @@ export type TeacherResponseDto = {
   cpf: string
   startDate: Date;
   createdAt: Date
+  disabled: boolean
   schoolId: string;
 }

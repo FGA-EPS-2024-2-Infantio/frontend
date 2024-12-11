@@ -2,6 +2,7 @@ export type CreateClassType = {
   name: string
   teacherId: string
   disabled?: boolean
+  userId: string
 }
 
 export type UpdateClassStudents = {

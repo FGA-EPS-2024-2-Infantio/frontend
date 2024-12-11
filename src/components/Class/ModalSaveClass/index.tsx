@@ -10,6 +10,7 @@ import { fetchTeachers } from '@/store/slices/teacherSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { ClassResponseDto, CreateClassType } from '@/types/Classes'
 import { Button, Form, Input, Modal, Select } from 'antd'
+import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -28,6 +29,7 @@ export default function ModalSaveClass({
   const [form] = Form.useForm<CreateClassType>()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.class)
+  const session = useSession()
 
   const { teachers, error: errorTeacher } = useSelector(
     (state: RootState) => state.teacher
@@ -66,7 +68,7 @@ export default function ModalSaveClass({
         const action = await dispatch(
           updateClass({
             id: classToEdit.id,
-            data: values
+            data: {...values, userId: session.data?.user.id ?? ""}
           })
         )
 
@@ -81,7 +83,7 @@ export default function ModalSaveClass({
           dispatch(fetchClassById(classToEdit.id))
         }
       } else {
-        const action = await dispatch(createClass(values))
+        const action = await dispatch(createClass({...values, userId: session.data?.user.id ?? ""}))
 
         if (createClass.rejected.match(action)) {
           toast.error(
