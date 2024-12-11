@@ -73,6 +73,10 @@ export default function ClassDetailsPage() {
     )
   }
 
+  const handleRowClick = (record: { id: string }) => {
+    router.push(`/tela_professor/${teacherId}/turmas/${classId}/${record.id}`)
+  }
+
   return (
     <div className='mx-6 space-y-4 rounded-lg bg-white p-6 shadow-lg'>
       <div className='mb-4 flex items-center justify-between'>
@@ -91,6 +95,9 @@ export default function ClassDetailsPage() {
             rowKey='id'
             pagination={false}
             bordered
+            onRow={record => ({
+              onClick: () => handleRowClick(record)
+            })}
           />
         </div>
 
