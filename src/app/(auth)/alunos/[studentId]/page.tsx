@@ -1,4 +1,5 @@
 'use client'
+import MonthlyPayment from '@/components/MonthlyPayment'
 import ModalCreateStudent from '@/components/Student/ModalCreateStudent'
 import { deleteStudentById, fetchStudentById } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
@@ -235,6 +236,12 @@ export default function StudentDetails() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         studentToEdit={student}
+      />
+
+      <MonthlyPayment
+        loading={loading}
+        payments={student.payments}
+        studentId={studentIdStr}
       />
     </div>
 
