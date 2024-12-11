@@ -1,3 +1,5 @@
+import { MonthlyPaymentResponseDto } from "./Payment";
+
 export type StudentDTO = {
     name?: string;
     isFilled?: boolean;
@@ -63,6 +65,7 @@ export type StudentsResponseDTO = {
     responsaveis?: ResponsavelDTO[];
     observacoes?: observacaoDTO[];
     observacoesMedicas?: ObservacoesMedicasDto;
+    payments: MonthlyPaymentResponseDto[];
     disabled: boolean;
     schoolId: string;
 }
