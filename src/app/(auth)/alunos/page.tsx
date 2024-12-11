@@ -51,6 +51,7 @@ export default function Students() {
 
   const data: StudentsResponseDTO[] = students?.map(student => ({
     id: student.id,
+    schoolId: student.schoolId,
     name: student.name,
     class: student.class,
     turn: student.turn,

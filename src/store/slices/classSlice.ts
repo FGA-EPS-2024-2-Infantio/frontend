@@ -155,7 +155,7 @@ export const fetchClassDetails = createAsyncThunk(
       const response = await axiosInstance.get(`/classes/${classId}`)
       console.log(response.data)
       return response.data
-    } catch (error) {
+    } catch {
       return rejectWithValue('Erro ao buscar detalhes da turma')
     }
   }

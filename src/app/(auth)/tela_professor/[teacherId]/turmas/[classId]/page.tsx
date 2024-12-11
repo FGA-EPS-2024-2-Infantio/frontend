@@ -1,11 +1,12 @@
 'use client'
 
-import { useRouter, useParams } from 'next/navigation'
-import { useEffect } from 'react'
-import { Button, Spin, Table } from 'antd'
-import { useSelector, useDispatch } from 'react-redux'
-import { AppDispatch, RootState } from '@/store/store'
 import { fetchClassDetails } from '@/store/slices/classSlice'
+import { AppDispatch, RootState } from '@/store/store'
+import { Button, Spin, Table } from 'antd'
+import classNames from 'classnames'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 export default function ClassDetailsPage() {
@@ -13,7 +14,7 @@ export default function ClassDetailsPage() {
   const { teacherId, classId } = useParams()
   const dispatch = useDispatch<AppDispatch>()
 
-  const { loading, error, classData, students, calls } = useSelector(
+  const { loading, error, classData, students } = useSelector(
     (state: RootState) => state.class
   )
 
@@ -36,24 +37,6 @@ export default function ClassDetailsPage() {
       dataIndex: 'name',
       key: 'name',
       render: (text: string) => <strong>{text}</strong>
-    }
-  ]
-
-  const callsColumns = [
-    {
-      title: 'Data',
-      dataIndex: 'date',
-      key: 'date'
-    },
-    {
-      title: 'Presentes',
-      dataIndex: 'presentCount',
-      key: 'presentCount'
-    },
-    {
-      title: 'Ausentes',
-      dataIndex: 'absentCount',
-      key: 'absentCount'
     }
   ]
 
@@ -95,21 +78,12 @@ export default function ClassDetailsPage() {
             rowKey='id'
             pagination={false}
             bordered
+            rowClassName={() =>
+              classNames('cursor-pointer hover:bg-gray-100 transition duration-200')
+            }
             onRow={record => ({
               onClick: () => handleRowClick(record)
             })}
-          />
-        </div>
-
-        <div>
-          <h3 className='text-lg font-semibold text-gray-800 mb-2'>Lista de Chamadas</h3>
-          <Table
-            columns={callsColumns}
-            
-            dataSource={calls}
-            rowKey='id'
-            pagination={false}
-            bordered
           />
         </div>
       </div>
