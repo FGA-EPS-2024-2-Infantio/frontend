@@ -74,19 +74,19 @@ export const fetchTeacherById = createAsyncThunk(
   }
 )
 
-// export const deleteTeacherById = createAsyncThunk(
-//   'teachers/deleteTeacherById',
-//   async (id: string, { rejectWithValue }) => {
-//     try {
-//       await axiosInstance.delete(`/teachers/${id}`)
-//       return id
-//     } catch (error) {
-//       return rejectWithValue(
-//         getAxiosErrorMessage(error, 'Erro ao desativar professor')
-//       )
-//     }
-//   }
-// )
+export const disableTeacherById = createAsyncThunk(
+  'teachers/disableTeacherById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await axiosInstance.delete(`/teachers/${id}`)
+      return id
+    } catch (error) {
+      return rejectWithValue(
+        getAxiosErrorMessage(error, 'Erro ao desativar professor')
+      )
+    }
+  }
+)
 
 export const createTeacher = createAsyncThunk(
   'teachers/createTeacher',

@@ -11,12 +11,11 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { toast } from 'react-toastify'
 
 export default function Teachers() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const { teachers, loading, error } = useSelector((state: RootState) => state.teacher)
+  const { teachers, loading } = useSelector((state: RootState) => state.teacher)
   
   const [schools, setSchools] = useState<{ [id: number]: string }>({})
 
@@ -24,12 +23,12 @@ export default function Teachers() {
     dispatch(fetchTeachers())
   }, [dispatch])
 
-  useEffect(() => {
-    if (error) {
-      console.log("erro", error)
-      toast.error(error)
-    }
-  }, [error])
+  // useEffect(() => {
+  //   if (error) {
+  //     console.log("erro",error)
+  //     toast.error(error)
+  //   }
+  // }, [error])
 
   // Função para buscar o nome da escola
   const fetchSchoolName = async (schoolId: string) => {
@@ -95,8 +94,9 @@ export default function Teachers() {
     numberOfClasses: teacher.numberOfClasses,
     cpf: teacher.cpf,
     startDate: teacher.startDate,
-    schoolId: teacher.schoolId,
     createdAt: teacher.createdAt,
+    disabled: teacher.disabled,
+    schoolId: teacher.schoolId
   }))
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -130,9 +130,10 @@ export default function Teachers() {
         onRow={record => ({
           onClick: () => handleRowClick(record)
         })}
-        rowClassName={() =>
+        rowClassName={({disabled}) =>
           classNames(
             'cursor-pointer hover:bg-gray-100 transition duration-200',
+            {'bg-red-100 hover:!bg-red-200': disabled}
           )
         }
         bordered

@@ -1,5 +1,6 @@
 'use client'
 import ModalSaveClass from '@/components/Class/ModalSaveClass'
+import { fetchAttendancesByClass } from '@/store/slices/attendanceSlice'
 import {
   deleteClassById,
   fetchClassById,
@@ -7,15 +8,15 @@ import {
 } from '@/store/slices/classSlice'
 import { fetchStudents } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
+import { AttendanceResponseDto } from '@/types/Attendances'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Select, Spin } from 'antd'
-import { useSession } from 'next-auth/react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
-export default function ClassDetails() {
+export default function ClassDetails({params}: {params: {classId: string}}) {
   const { classId } = useParams()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error, classObj } = useSelector(
@@ -23,15 +24,41 @@ export default function ClassDetails() {
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
-  const classIdStr = Array.isArray(classId) ? classId[0] : classId
+  // const classIdStr = Array.isArray(classId) ? classId[0] : classId // Se der BO
 
   const { students, error: errorStudents } = useSelector(
     (state: RootState) => state.student
   )
 
+  const { attendances, error: todoMundoErra } = useSelector((state: RootState) => state.attendence)
+  const uniqueDates = new Set<string>();
+  const filteredAttendances: AttendanceResponseDto[] = [];
+
+  attendances.forEach(attendance => {
+    const formattedDate = new Date(attendance.date).toDateString().split('T')[0];
+
+    if (!uniqueDates.has(formattedDate)) {
+      uniqueDates.add(formattedDate);
+      filteredAttendances.push(attendance);
+    }
+  });
+
+  const router = useRouter()
+
+  useEffect(() => {
+    dispatch(fetchAttendancesByClass(params.classId))
+  }, [dispatch, params.classId])
+
   useEffect(() => {
     dispatch(fetchStudents())
   }, [dispatch])
+
+  useEffect(() => {
+    if (todoMundoErra) {
+      console.log('Todo mundo vai errar', todoMundoErra)
+      toast.error(todoMundoErra)
+    }
+  })
 
   useEffect(() => {
     if (errorStudents) {
@@ -41,10 +68,10 @@ export default function ClassDetails() {
   }, [errorStudents])
 
   useEffect(() => {
-    if (classIdStr) {
-      dispatch(fetchClassById(classIdStr))
+    if (params.classId) {
+      dispatch(fetchClassById(params.classId))
     }
-  }, [dispatch, classIdStr])
+  }, [dispatch, params.classId])
 
   useEffect(() => {
     if (error) {
@@ -58,37 +85,41 @@ export default function ClassDetails() {
     }
   }, [classObj])
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
+    console.log(event.key);
+  }
+
   const handleUpdateStudents = () => {
     dispatch(
       updateClassStudents({
-        id: classIdStr,
+        id: params.classId,
         data: { studentIds: selectedStudents }
       })
     )
       .unwrap()
       .then(() => {
         toast.success('Alunos atualizados com sucesso!')
-        dispatch(fetchClassById(classIdStr))
+        dispatch(fetchClassById(params.classId))
       })
       .catch(error => toast.error(`Erro: ${error.message}`))
   }
 
   const handleDeactivateClass = useCallback(() => {
-    dispatch(deleteClassById(classIdStr))
+    dispatch(deleteClassById(params.classId))
       .unwrap()
       .then(() => {
         toast.success('Turma desativada com sucesso')
-        dispatch(fetchClassById(classIdStr))
+        dispatch(fetchClassById(params.classId))
       })
       .catch(error => toast.error(`Erro: ${error.message}`))
-  }, [dispatch, classIdStr])
+  }, [dispatch, params.classId])
 
   const actionMenuItems = useMemo(() => {
     const items = []
 
     items.push({
       key: 'editClass',
-      label: <span onClick={() => setIsModalOpen(true)}>Editar escola</span>
+      label: <span onKeyDown={handleKeyDown} onClick={() => setIsModalOpen(true)}>Editar turma</span>
     })
 
     if (!classObj?.disabled) {
@@ -111,15 +142,16 @@ export default function ClassDetails() {
     return items
   }, [handleDeactivateClass, classObj?.disabled])
 
-  const session = useSession()
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const attendanceId = event.currentTarget.id;
+    const attendanceDate = event.currentTarget.getAttribute('data-id');
+    console.log("data",attendanceDate);
+    console.log("id",attendanceId);
 
-  if (session.data?.user.role !== 'ADMIN' && session.data?.user.role !== 'DIRECTOR') {
-    return (
-      <div className='mx-6 rounded-lg bg-white p-6 shadow-lg'>
-        <div className='mb-4 flex items-center justify-between'>Você não possui autorização para visualizar essa tela!</div>
-      </div>
-    )
-  }
+    if (attendanceDate && attendanceId) {
+      router.push(`${classId}/chamada/${attendanceDate}/${attendanceId}`);
+    }
+  };
 
   if (loading)
     return (
@@ -151,18 +183,20 @@ export default function ClassDetails() {
       <div className='space-y-4'>
         <div className='flex items-center gap-4'>
           <span
-            className={`rounded-full px-3 py-1 text-sm font-medium ${
-              classObj.disabled
-                ? 'bg-red-100 text-red-700'
-                : 'bg-green-100 text-green-700'
-            }`}
+            className={`rounded-full px-3 py-1 text-sm font-medium ${classObj.disabled
+              ? 'bg-red-100 text-red-700'
+              : 'bg-green-100 text-green-700'
+              }`}
           >
             {classObj.disabled ? 'Desabilitada' : 'Habilitada'}
           </span>
-          <p className='text-lg text-gray-700'>
+          <p className='text-lg flex-1 text-gray-700'>
             Professor:{' '}
             <span className='font-medium'>{classObj.teacher.name}</span>
           </p>
+          <Button type='primary' size='large' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
+            + Criar nova chamada
+          </Button  >
         </div>
       </div>
 
@@ -211,6 +245,39 @@ export default function ClassDetails() {
         >
           Atualizar alunos
         </Button>
+      </div>
+
+      {/*Lista de chamadas */}
+      <div className='space-y-4'>
+        <h3 className='text-lg font-semibold text-gray-800'>Chamadas:</h3>
+        {filteredAttendances.length > 0 ? (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3'>
+            {filteredAttendances.map(attendance => (
+              <div
+                onClick={handleClick}
+                onKeyDown={handleKeyDown}
+                key={attendance.id}
+                id={attendance.id}
+                data-id={attendance.date ? new Date(attendance.date).toISOString().split('T')[0] : ''}
+                className='flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm hover:shadow-md hover:cursor-pointer'
+              >
+                <div className='flex-1'>
+                  <p className="font-medium text-gray-900">
+                    {(() => {
+                      const date = new Date(attendance.date);
+                      const day = date.getUTCDate().toString().padStart(2, '0');
+                      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+                      const year = date.getUTCFullYear();
+                      return `${day}/${month}/${year}`;
+                    })()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className='text-gray-500'>Nenhum chamada cadastrada.</p>
+        )}
       </div>
 
       {/* Modal */}
