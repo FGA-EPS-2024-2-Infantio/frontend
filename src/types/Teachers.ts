@@ -5,7 +5,7 @@ export type CreateTeacherType = {
   password: string
   numberOfClasses: number
   cpf: string
-  startDate: string | null;
+  startDate: Date;
   schoolId: string;
 }
 

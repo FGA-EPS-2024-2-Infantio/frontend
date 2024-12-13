@@ -26,12 +26,11 @@ export default function ModalSaveTeacher({
   // Atualizar os campos apenas quando teacherToEdit estiver disponível
   useEffect(() => {
     if (teacherToEdit) {
-      console.log(teacherToEdit)
       form.setFieldsValue({
         name: teacherToEdit.name,
         numberOfClasses: teacherToEdit.numberOfClasses,
         cpf: teacherToEdit.cpf,
-        startDate: dayjs(teacherToEdit.startDate).toISOString() ?? null,
+        startDate: dayjs(teacherToEdit.startDate),
         schoolId: teacherToEdit.schoolId,
       });
     }
@@ -65,9 +64,6 @@ export default function ModalSaveTeacher({
       const teacherData: CreateTeacherType = {
             ...values,
             schoolId: values.schoolId,
-            startDate: dayjs(values.startDate).isValid() 
-            ? dayjs(values.startDate).toISOString() 
-            : null,
           };
 
       if (teacherToEdit) {
@@ -182,6 +178,8 @@ export default function ModalSaveTeacher({
             className="w-full"
             placeholder="Data de Início"
             format="DD/MM/YYYY"
+            value={form.getFieldValue("startDate")} 
+            onChange={(date) => form.setFieldValue('startDate', date)} 
           />
         </Form.Item>
 
