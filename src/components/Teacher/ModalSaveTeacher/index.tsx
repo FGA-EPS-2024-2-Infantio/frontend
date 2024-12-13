@@ -67,10 +67,15 @@ export default function ModalSaveTeacher({
           };
 
       if (teacherToEdit) {
+        const processedValues = {
+          ...values,
+          startDate: values.startDate ? new Date(values.startDate) : new Date(),
+        };
+
         const action = await dispatch(
           updateTeacher({
             id: teacherToEdit.id,
-            data: values
+            data: processedValues
           })
         )
 
@@ -115,7 +120,6 @@ export default function ModalSaveTeacher({
         layout="vertical"
         onFinish={handleSaveTeacher}
         className="space-y-4"
-        initialValues={teacherToEdit || {}}
       >
         <Form.Item
           name="name"
@@ -178,8 +182,6 @@ export default function ModalSaveTeacher({
             className="w-full"
             placeholder="Data de Início"
             format="DD/MM/YYYY"
-            value={form.getFieldValue("startDate")} 
-            onChange={(date) => form.setFieldValue('startDate', date)} 
           />
         </Form.Item>
 
