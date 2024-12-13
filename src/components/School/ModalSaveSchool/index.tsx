@@ -40,7 +40,10 @@ export default function ModalSaveSchool({
 
   const handleSaveSchool = async () => {
     try {
+      console.log("aaaaaaaaaaaaa")
       const values = await form.validateFields()
+
+      console.log(values)
 
       if (schoolToEdit) {
         const action = await dispatch(
@@ -102,50 +105,50 @@ export default function ModalSaveSchool({
           <Input placeholder='Nome da Escola' />
         </Form.Item>
 
-        <Form.Item
+        {!schoolToEdit && <Form.Item
           name='directorName'
           label='Nome do direitor'
           rules={[
-            { required: true, message: 'Por favor, insira o nome do diretor' }
+            { required: schoolToEdit ? false : true, message: 'Por favor, insira o nome do diretor' }
           ]}
         >
           <Input placeholder='Nome da diretor' />
-        </Form.Item>
+        </Form.Item>}
 
-        <Form.Item
+        {!schoolToEdit && <Form.Item
           name='directorEmail'
           label='E-mail do Diretor'
           rules={[
             {
-              required: true,
+              required: schoolToEdit ? false : true,
               message: 'Por favor, insira o e-mail do diretor'
             },
             { type: 'email', message: 'Por favor, insira um e-mail válido' }
           ]}
         >
           <Input placeholder='E-mail do Diretor' />
-        </Form.Item>
+        </Form.Item>}
 
-        <Form.Item
+        {!schoolToEdit && <Form.Item
           name='directorPassword'
           label='Senha de acesso do diretor'
           rules={[
             {
-              required: true,
+              required: schoolToEdit ? false : true,
               message: 'Por favor, insira a senha do diretor'
             },
             { required:true, message: 'Por favor, insira uma senha' }
           ]}
         >
           <Input placeholder='Senha do Diretor' />
-        </Form.Item>
+        </Form.Item>}
 
         <Form.Item
           name='numberStudents'
           label='Quantidade de alunos'
           rules={[
             {
-              required: true,
+              required: false,
               message: 'Por favor, insira a quantidade de alunos'
             }
           ]}

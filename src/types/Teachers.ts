@@ -1,10 +1,11 @@
+
 export type CreateTeacherType = {
   name: string
   email: string
   password: string
   numberOfClasses: number
   cpf: string
-  startDate: Date;
+  startDate: string | null;
   schoolId: string;
 }
 

@@ -5,10 +5,10 @@ import { fetchStudentById } from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { MonthlyPaymentDto, MonthlyPaymentResponseDto } from '@/types/Payment'
 import { Button, DatePicker, Form, InputNumber, Modal, Switch } from 'antd'
+import moment from 'moment'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-
 type Props = {
   isModalOpen: boolean
   setIsModalOpen: (state: boolean) => void
@@ -40,9 +40,12 @@ export default function ModalCreatePayment({
         year: monthlyPaymentToEdit.year,
         payed: monthlyPaymentToEdit.payed,
         value: monthlyPaymentToEdit.value,
+        date: monthlyPaymentToEdit.year && monthlyPaymentToEdit.month 
+        ? moment(`${monthlyPaymentToEdit.year}-${monthlyPaymentToEdit.month}`, 'YYYY-MM') 
+        : null,
       })
     }
-  }, [isModalOpen, monthlyPaymentToEdit, form])
+  }, [form, isModalOpen, monthlyPaymentToEdit])
 
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.payment)
@@ -117,7 +120,7 @@ export default function ModalCreatePayment({
           name='date'
           label='Mês/Ano'
           rules={[{
-            required: true, message: 'Necessário indicar a data de pagamento'
+            required: monthlyPaymentToEdit ? false : true, message: 'Necessário indicar a data de pagamento'
           }]}
          >
           <DatePicker 
@@ -125,6 +128,7 @@ export default function ModalCreatePayment({
               format: 'YYYY/MM',
               type: 'mask'
             }}
+            disabled={monthlyPaymentToEdit ? true : false}
             picker='month'
           />
         </Form.Item>

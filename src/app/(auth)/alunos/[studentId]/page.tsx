@@ -155,13 +155,12 @@ export default function StudentDetails() {
         <div className="border p-8 rounded-md shadow-sm bg-white mb-6">
           <h2 className="text-2xl font-semibold mb-6">Dados do Estudante</h2>
 
-          <p>
-        {student.disabled ? (
-          <p className='text-red-500'>Desabilitada</p>
-        ) : (
-          <p className='text-green-500'>Habilitada</p>
-        )}
-      </p>
+          
+          {student.disabled ? (
+            <p className='text-red-500'>Desabilitada</p>
+          ) : (
+            <p className='text-green-500'>Habilitada</p>
+          )}
 
           <div className="text-md">
             <p><strong>Nome  Completo:</strong> {student.name}</p>

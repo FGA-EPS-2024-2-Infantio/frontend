@@ -195,16 +195,16 @@ export default function ModalCreateStudent({
           />
         </Form.Item>
 
-        <Form.Item
+        {!studentToEdit && <Form.Item
           name="schoolId"
           label="Selecione a Escola"
-          rules={[{ required: true, message: 'Por favor, selecione a escola' }]}
+          rules={[{ required: studentToEdit ? false : true, message: 'Por favor, selecione a escola' }]}
         >
           <Select
             placeholder="Selecione a Escola"
             options={schoolOptions} 
           />
-        </Form.Item>
+        </Form.Item>}
 
 
         <div className='flex justify-end'>

@@ -26,11 +26,12 @@ export default function ModalSaveTeacher({
   // Atualizar os campos apenas quando teacherToEdit estiver disponível
   useEffect(() => {
     if (teacherToEdit) {
+      console.log(teacherToEdit)
       form.setFieldsValue({
         name: teacherToEdit.name,
         numberOfClasses: teacherToEdit.numberOfClasses,
         cpf: teacherToEdit.cpf,
-        startDate: dayjs(teacherToEdit.startDate),
+        startDate: dayjs(teacherToEdit.startDate).toISOString() ?? null,
         schoolId: teacherToEdit.schoolId,
       });
     }
@@ -61,11 +62,13 @@ export default function ModalSaveTeacher({
   const handleSaveTeacher = async () => {
     try {
       const values = await form.validateFields()
-
       const teacherData: CreateTeacherType = {
-        ...values,
-        schoolId: values.schoolId,
-      };
+            ...values,
+            schoolId: values.schoolId,
+            startDate: dayjs(values.startDate).isValid() 
+            ? dayjs(values.startDate).toISOString() 
+            : null,
+          };
 
       if (teacherToEdit) {
         const action = await dispatch(
@@ -128,7 +131,7 @@ export default function ModalSaveTeacher({
           <Input placeholder="Nome do Professor" />
         </Form.Item>
 
-        <Form.Item
+        {!teacherToEdit && <Form.Item
           name="email"
           label="E-mail do Professor"
           rules={[
@@ -136,9 +139,9 @@ export default function ModalSaveTeacher({
           ]}
         >
           <Input placeholder="E-mail do Professor" />
-        </Form.Item>
+        </Form.Item>}
 
-        <Form.Item
+        {!teacherToEdit && <Form.Item
           name="password"
           label="Senha do Professor"
           rules={[
@@ -146,7 +149,7 @@ export default function ModalSaveTeacher({
           ]}
         >
           <Input placeholder="Senha do Professor" />
-        </Form.Item>
+        </Form.Item>}
 
         <Form.Item
           name="numberOfClasses"
@@ -179,12 +182,10 @@ export default function ModalSaveTeacher({
             className="w-full"
             placeholder="Data de Início"
             format="DD/MM/YYYY"
-            value={form.getFieldValue("startDate")} 
-            onChange={(date) => form.setFieldValue('startDate', date)} 
           />
         </Form.Item>
 
-        <Form.Item
+        {!teacherToEdit && <Form.Item
           name="schoolId"
           label="Selecione a Escola"
           rules={[{ required: true, message: 'Por favor, selecione a escola' }]}
@@ -193,7 +194,7 @@ export default function ModalSaveTeacher({
             placeholder="Selecione a Escola"
             options={schoolOptions} 
           />
-        </Form.Item>
+        </Form.Item>}
 
         <div className="flex justify-end">
           <Button onClick={handleCancel} className="mr-2">
