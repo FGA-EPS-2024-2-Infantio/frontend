@@ -35,3 +35,14 @@
 //     }
 //   }
 // }
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // Ignora erros específicos relacionados ao writeText
+    if (err.message.includes('writeText')) {
+      return false;
+    }
+    // Permite outros erros passarem
+    return true;
+  });
+  
+  
