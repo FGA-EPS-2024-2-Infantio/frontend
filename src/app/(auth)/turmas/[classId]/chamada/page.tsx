@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
 import { Button, Checkbox, DatePicker, Divider, Form, FormProps, Spin, Table, TableProps } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
+import { useSession } from "next-auth/react";
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,7 @@ const Page = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const router = useRouter();
+  const session = useSession();
 
 
   const handleDateChange = (date: Date) => {
@@ -34,11 +36,11 @@ const Page = () => {
   )
 
   useEffect(() => {
-    dispatch(fetchStudents())
+    dispatch(fetchStudents(session.data?.user.id ?? ""))
     const students: CreateAttendanceType[] = []
     classObj?.students.forEach(student => students.push({ studentId: student.id, classId: classIdStr, date: new Date(), hasAttended: false }))
     setStudentList(students)
-  }, [dispatch])
+  }, [dispatch, session.data?.user.id])
 
   const handleChange = (event: CheckboxChangeEvent) => {
     const isChecked = event.target.checked;

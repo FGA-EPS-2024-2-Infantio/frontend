@@ -160,7 +160,7 @@ export default function FormularioMatricula() {
         const updatedData = form.getFieldsValue()
         const studentData = {
           name: student?.name,
-          schoolId: student?.schoolId ?? '',
+          userId: student?.userId ?? "",
           isFilled: true,
           categorie: student?.categorie,
           class: student?.class,

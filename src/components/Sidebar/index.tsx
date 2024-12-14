@@ -49,7 +49,7 @@ export default function Sidebar({ session }: Props) {
     (session.user.role === 'DIRECTOR') &&
       getItem('Turmas', '4', <BookOutlined />),
     (session.user.role === 'TEACHER') &&
-      getItem('Turmas do professor', '5', <BookOutlined />),
+      getItem('Minhas turmas', '5', <BookOutlined />),
     getItem('Perfil', '6', <UserOutlined />)
   ].filter(Boolean) as MenuItem[]
 
