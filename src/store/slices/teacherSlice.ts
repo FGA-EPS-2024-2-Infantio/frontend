@@ -54,8 +54,8 @@ const getAxiosErrorMessage = (error: unknown, defaultMessage: string) => {
 
 export const fetchTeachers = createAsyncThunk(
   'teachers/fetchTeachers',
-  async () => {
-    const response = await axiosInstance.get('/teachers')
+  async (id: string) => {
+    const response = await axiosInstance.get(`/teachers/${id}/list`)
     return response.data
   }
 )

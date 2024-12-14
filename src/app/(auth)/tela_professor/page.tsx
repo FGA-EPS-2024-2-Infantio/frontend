@@ -1,26 +1,28 @@
 'use client'
 
+import { fetchTeacherClasses } from '@/store/slices/teacherSlice'
+import { AppDispatch, RootState } from '@/store/store'
+import { Spin, Table } from 'antd'
+import classNames from 'classnames'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/store/store'
-import { fetchTeachers } from '@/store/slices/teacherSlice'
-import { Table, Spin } from 'antd'
 import { toast } from 'react-toastify'
-import classNames from 'classnames'
-import { useRouter } from 'next/navigation'
-import { TeacherResponseDto } from '@/types/Teachers'
 
-export default function TeacherScreen() {
+export default function TurmasDoProfessor() {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  
-  const { teachers, loading, error } = useSelector(
+  const session = useSession();
+  const { loading, error, teacherClasses } = useSelector(
     (state: RootState) => state.teacher
   )
 
   useEffect(() => {
-    dispatch(fetchTeachers())
-  }, [dispatch])
+    if (session.data?.user) {
+      dispatch(fetchTeacherClasses(session.data?.user.id ?? ""))
+    }
+  }, [dispatch, session.data?.user])
 
   useEffect(() => {
     if (error) {
@@ -30,59 +32,51 @@ export default function TeacherScreen() {
 
   const columns = [
     {
-      title: 'Nome',
+      title: 'Nome da Turma',
       dataIndex: 'name',
       key: 'name',
       render: (text: string) => <strong>{text}</strong>
     },
     {
-      title: 'Número de turmas',
-      dataIndex: 'numberOfClasses',
-      key: 'numberOfClasses'
-    },
-    {
-      title: 'CPF',
-      dataIndex: 'cpf',
-      key: 'cpf'
-    },
-    {
-      title: 'Data de Início',
-      dataIndex: 'startDate',
-      key: 'startDate',
-      render: (date: Date) => new Date(date).toLocaleDateString('pt-BR')
+      title: 'Quantidade de Estudantes',
+      dataIndex: 'students',
+      key: 'students',
+      render: (students: { id: string; name: string }[] | undefined) =>
+        <span>{Array.isArray(students) ? students.length : 0}</span>
     }
   ]
 
-  const handleRowClick = (record: TeacherResponseDto) => {
-    router.push(`/tela_professor/${record.id}`)
+  const handleRowClick = (record: { id: string }) => {
+    router.push(`/tela_professor/turmas/${record.id}`)
+  }
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <Spin size='large' />
+      </div>
+    )
+  }
+
+  if (teacherClasses.length === 0) {
+    return <div className='text-center py-4'>Nenhuma turma encontrada</div>
   }
 
   return (
-    <div className='mx-6 rounded-lg bg-white p-6 shadow-lg'>
-      <h2 className='text-lg font-semibold mb-4'>Tela do Professor</h2>
-
-      {loading ? (
-        <div className='flex h-full items-center justify-center'>
-          <Spin size='large' />
-        </div>
-      ) : teachers.length === 0 ? (
-        <div className='text-center py-4'>
-          Nenhum professor encontrado
-        </div>
-      ) : (
-        <Table<TeacherResponseDto>
-          columns={columns}
-          dataSource={teachers}
-          pagination={false}
-          onRow={record => ({
-            onClick: () => handleRowClick(record)
-          })}
-          rowClassName={() =>
-            classNames('cursor-pointer hover:bg-gray-100 transition duration-200')
-          }
-          bordered
-        />
-      )}
+    <div className='p-6'>
+      <h1 className='text-2xl font-bold mb-4'>Turmas do Professor</h1>
+      <Table
+        columns={columns}
+        dataSource={teacherClasses}
+        rowKey='id'
+        bordered
+        rowClassName={() =>
+          classNames('cursor-pointer hover:bg-gray-100 transition duration-200')
+        }
+        onRow={record => ({
+          onClick: () => handleRowClick(record)
+        })}
+      />
     </div>
   )
 }

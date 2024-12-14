@@ -11,6 +11,7 @@ import { AppDispatch, RootState } from '@/store/store'
 import { AttendanceResponseDto } from '@/types/Attendances'
 import { ChevronDown } from '@untitled-ui/icons-react'
 import { Button, Dropdown, Popconfirm, Select, Spin } from 'antd'
+import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -25,6 +26,7 @@ export default function ClassDetails({params}: {params: {classId: string}}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   // const classIdStr = Array.isArray(classId) ? classId[0] : classId // Se der BO
+  const session = useSession()
 
   const { students, error: errorStudents } = useSelector(
     (state: RootState) => state.student
@@ -50,8 +52,8 @@ export default function ClassDetails({params}: {params: {classId: string}}) {
   }, [dispatch, params.classId])
 
   useEffect(() => {
-    dispatch(fetchStudents())
-  }, [dispatch])
+    dispatch(fetchStudents(session.data?.user.id ?? ""))
+  }, [dispatch, session.data?.user.id])
 
   useEffect(() => {
     if (todoMundoErra) {
