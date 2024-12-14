@@ -44,8 +44,8 @@ export const fetchSchools = createAsyncThunk(
 
 export const fetchStudents = createAsyncThunk(
   'students/fetchStudents',
-  async () => {
-    const response = await axiosInstance.get('/students')
+  async (id: string) => {
+    const response = await axiosInstance.get(`/students/${id}/list`)
     return response.data
   }
 )

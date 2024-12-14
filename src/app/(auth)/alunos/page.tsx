@@ -20,9 +20,11 @@ export default function Students() {
     (state: RootState) => state.student
   )
 
+  const session = useSession()
+
   useEffect(() => {
-    dispatch(fetchStudents())
-  }, [dispatch])
+    dispatch(fetchStudents(session.data?.user.id ?? ""))
+  }, [dispatch, session.data?.user.id])
 
   useEffect(() => {
     if (error) {
@@ -65,8 +67,6 @@ export default function Students() {
   const handleRowClick = (record: StudentsResponseDTO) => {
     router.push(`/alunos/${record.id}`)
   }
-
-  const session = useSession()
 
   if (session.data?.user.role !== 'ADMIN' && session.data?.user.role !== 'DIRECTOR') {
     return (

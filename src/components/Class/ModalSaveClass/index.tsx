@@ -36,8 +36,8 @@ export default function ModalSaveClass({
   )
 
   useEffect(() => {
-    dispatch(fetchTeachers())
-  }, [dispatch])
+    dispatch(fetchTeachers(session.data?.user.id ?? ""))
+  }, [dispatch, session.data?.user.id])
 
   useEffect(() => {
     if (errorTeacher) {
@@ -79,7 +79,7 @@ export default function ModalSaveClass({
         } else {
           toast.success('Turma atualizada com sucesso')
           setIsModalOpen(false)
-          dispatch(fetchClasses())
+          dispatch(fetchClasses(session.data?.user.id ?? ""))
           dispatch(fetchClassById(classToEdit.id))
         }
       } else {
@@ -92,7 +92,7 @@ export default function ModalSaveClass({
         } else {
           toast.success('Turma criada com sucesso')
           setIsModalOpen(false)
-          dispatch(fetchClasses())
+          dispatch(fetchClasses(session.data?.user.id ?? ""))
         }
       }
     } catch (error) {

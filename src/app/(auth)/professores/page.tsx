@@ -17,11 +17,13 @@ export default function Teachers() {
   const dispatch = useDispatch<AppDispatch>()
   const { teachers, loading } = useSelector((state: RootState) => state.teacher)
   
+  const session = useSession()
+
   const [schools, setSchools] = useState<{ [id: number]: string }>({})
 
   useEffect(() => {
-    dispatch(fetchTeachers())
-  }, [dispatch])
+    dispatch(fetchTeachers(session.data?.user.id ?? ""))
+  }, [dispatch, session.data?.user.id])
 
   // useEffect(() => {
   //   if (error) {
@@ -104,8 +106,6 @@ export default function Teachers() {
   const handleRowClick = (record: TeacherResponseDto) => {
     router.push(`/professores/${record.id}`)
   }
-
-  const session = useSession()
 
   if (session.data?.user.role !== 'ADMIN' && session.data?.user.role !== 'DIRECTOR') {
     return (

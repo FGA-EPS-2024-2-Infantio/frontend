@@ -6,7 +6,7 @@ export type CreateTeacherType = {
   numberOfClasses: number
   cpf: string
   startDate: Date;
-  schoolId: string;
+  userId: string;
 }
 
 export type TeacherResponseDto = {

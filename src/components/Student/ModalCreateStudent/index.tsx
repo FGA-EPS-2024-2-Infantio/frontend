@@ -1,10 +1,21 @@
 'use client'
 
-import { createStudent, fetchSchools, fetchStudents, updateStudent } from '@/store/slices/studentSlice'
+import {
+  createStudent,
+  fetchStudents,
+  updateStudent
+} from '@/store/slices/studentSlice'
 import { AppDispatch, RootState } from '@/store/store'
-import { CategorieType, ClassType, StudentDTO, StudentsResponseDTO, TurnType } from '@/types/Students'
+import {
+  CategorieType,
+  ClassType,
+  StudentDTO,
+  StudentsResponseDTO,
+  TurnType
+} from '@/types/Students'
 import { Button, Form, Input, Modal, Select } from 'antd'
-import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
@@ -53,7 +64,6 @@ const classType = [
     value: ClassType.REFORCO,
     label: 'Reforço'
   }
-  
 ]
 
 export default function ModalCreateStudent({
@@ -63,8 +73,7 @@ export default function ModalCreateStudent({
 }: Props) {
   const [form] = Form.useForm<StudentDTO>()
   const dispatch = useDispatch<AppDispatch>()
-  const [schoolOptions, setSchoolOptions] = useState<{ value: number, label: string }[]>([])
-  const { loading, schools } = useSelector((state: RootState) => state.student)
+  const { loading } = useSelector((state: RootState) => state.student)
 
   const handleCancel = () => {
     form.resetFields()
@@ -77,48 +86,38 @@ export default function ModalCreateStudent({
         name: studentToEdit.name,
         class: studentToEdit.class,
         categorie: studentToEdit.categorie,
-        turn: studentToEdit.turn,
-        schoolId: studentToEdit.schoolId,
+        turn: studentToEdit.turn
       })
     }
   }, [studentToEdit, form])
 
-  // Requisição para buscar escolas
-  useEffect(() => {
-    if (schools.length === 0) {
-      dispatch(fetchSchools())
-    }
-  }, [dispatch, schools]);
-
-  // Atualiza as opções do Select sempre que o estado de schools for alterado
-  useEffect(() => {
-    if (schools.length > 0) {
-      const options = schools.map((school) => ({
-        value: school.id, 
-        label: school.name
-      }));
-      setSchoolOptions(options);
-      
-
-    }
-  }, [schools]);
-
-
+  const session = useSession()
 
   const handleCreateStudent = async () => {
     try {
       const values = await form.validateFields()
-      const action = studentToEdit ? await dispatch(updateStudent({ id: studentToEdit.id, data: values })) : await dispatch(createStudent(values))
-      
-      if (createStudent.rejected.match(action) || updateStudent.rejected.match(action)) {
+      values.userId = session.data?.user.id ?? ''
+      const action = studentToEdit
+        ? await dispatch(updateStudent({ id: studentToEdit.id, data: values }))
+        : await dispatch(createStudent(values))
+
+      if (
+        createStudent.rejected.match(action) ||
+        updateStudent.rejected.match(action)
+      ) {
         toast.error(
-          studentToEdit ? `Erro ao atualizar o aluno: ${action.payload || 'Erro ao atualizar Aluno'}` 
-          : `Erro ao criar Aluno: ${action.payload || 'Erro ao criar Aluno'}`
+          studentToEdit
+            ? `Erro ao atualizar o aluno: ${action.payload || 'Erro ao atualizar Aluno'}`
+            : `Erro ao criar Aluno: ${action.payload || 'Erro ao criar Aluno'}`
         )
       } else {
         setIsModalOpen(false)
-        dispatch(fetchStudents());
-        toast.success(studentToEdit ? `Aluno atualizado com sucesso` : `Aluno criado com sucesso`)
+        dispatch(fetchStudents(session.data?.user.id ?? ''))
+        toast.success(
+          studentToEdit
+            ? `Aluno atualizado com sucesso`
+            : `Aluno criado com sucesso`
+        )
         form.resetFields()
       }
     } catch (error) {
@@ -160,9 +159,7 @@ export default function ModalCreateStudent({
             }
           ]}
         >
-          <Select placeholder='Turno do Aluno'
-            options={turnType}
-          />
+          <Select placeholder='Turno do Aluno' options={turnType} />
         </Form.Item>
 
         <Form.Item
@@ -172,12 +169,10 @@ export default function ModalCreateStudent({
             {
               required: true,
               message: 'Por favor, insira um periodo válido'
-            },
+            }
           ]}
         >
-          <Select placeholder='Periodo do Aluno'
-            options={optsPeriod}
-          />
+          <Select placeholder='Periodo do Aluno' options={optsPeriod} />
         </Form.Item>
 
         <Form.Item
@@ -187,25 +182,11 @@ export default function ModalCreateStudent({
             {
               required: true,
               message: 'Por favor, insira uma Turma válida'
-            },
+            }
           ]}
         >
-          <Select placeholder='Turma do Aluno'
-            options={classType}
-          />
+          <Select placeholder='Turma do Aluno' options={classType} />
         </Form.Item>
-
-        {!studentToEdit && <Form.Item
-          name="schoolId"
-          label="Selecione a Escola"
-          rules={[{ required: studentToEdit ? false : true, message: 'Por favor, selecione a escola' }]}
-        >
-          <Select
-            placeholder="Selecione a Escola"
-            options={schoolOptions} 
-          />
-        </Form.Item>}
-
 
         <div className='flex justify-end'>
           <Button onClick={handleCancel} className='mr-2'>

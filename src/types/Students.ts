@@ -15,7 +15,7 @@ export type StudentDTO = {
     responsaveis?: ResponsavelDTO[];
     observacoes?: observacaoDTO[];
     observacoesMedicas?: ObservacoesMedicasDto;
-    schoolId: string;
+    userId: string;
 }
 export type ParentDataDTO = {
     nome?: string;
@@ -67,7 +67,7 @@ export type StudentsResponseDTO = {
     observacoesMedicas?: ObservacoesMedicasDto;
     payments: MonthlyPaymentResponseDto[];
     disabled: boolean;
-    schoolId: string;
+    userId: string;
 }
 
 export enum CategorieType {

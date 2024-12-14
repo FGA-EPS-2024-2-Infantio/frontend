@@ -2,7 +2,7 @@
 
 import { fetchClassDetails } from '@/store/slices/classSlice'
 import { AppDispatch, RootState } from '@/store/store'
-import { Button, Spin, Table } from 'antd'
+import { Spin, Table } from 'antd'
 import classNames from 'classnames'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 
 export default function ClassDetailsPage() {
   const router = useRouter()
-  const { teacherId, classId } = useParams()
+  const { classId } = useParams()
   const dispatch = useDispatch<AppDispatch>()
 
   const { loading, error, classData, students } = useSelector(
@@ -25,11 +25,11 @@ export default function ClassDetailsPage() {
   }, [error])
 
   useEffect(() => {
-    if (teacherId && classId) {
+    if (classId) {
       dispatch(fetchClassDetails(Array.isArray(classId) ? classId[0] : classId))
       
     }
-  }, [teacherId, classId, dispatch])
+  }, [classId, dispatch])
 
   const studentColumns = [
     {
@@ -57,17 +57,17 @@ export default function ClassDetailsPage() {
   }
 
   const handleRowClick = (record: { id: string }) => {
-    router.push(`/tela_professor/${teacherId}/turmas/${classId}/${record.id}`)
+    router.push(`/tela_professor/turmas/${classId}/${record.id}`)
   }
 
   return (
     <div className='mx-6 space-y-4 rounded-lg bg-white p-6 shadow-lg'>
-      <div className='mb-4 flex items-center justify-between'>
+      {/* <div className='mb-4 flex items-center justify-between'>
         <h2 className='text-xl font-semibold text-gray-800'>{classData.name}</h2>
         <Button type='primary' onClick={() => console.log('Iniciar chamada')}>
           Chamada
         </Button>
-      </div>
+      </div> */}
 
       <div className='space-y-6'>
         <div>
