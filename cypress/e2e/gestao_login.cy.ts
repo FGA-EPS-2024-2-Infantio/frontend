@@ -1,7 +1,7 @@
 describe('Funcionalidade Login', () => {
 
     beforeEach(()=>{
-      cy.visit('http://localhost:3000/');
+      cy.visit('http://34.72.186.216:3000/');
     })
 
     it('Não deve realizar login', () => {
@@ -24,7 +24,7 @@ describe('Funcionalidade Login', () => {
   
       cy.contains('Sign in with Credentials').click();
   
-      cy.url().should('include', 'http://localhost:3000/');
+      cy.url().should('include', 'http://34.72.186.216:3000/');
 
       cy.wait(2000);
       cy.contains('Sair do sistema').click();

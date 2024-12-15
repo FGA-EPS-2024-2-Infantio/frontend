@@ -1,6 +1,6 @@
 describe('Funcionalidade Gestão de Escolas', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/');
+    cy.visit('http://34.72.186.216:3000/');
 
     cy.get('input[name="username"]').type('admin@admin.com');
     cy.get('input[name="password"]').type('admin');
@@ -31,7 +31,7 @@ describe('Funcionalidade Gestão de Escolas', () => {
     cy.get('input[id="numberStudents"]').type('10');
 
     cy.wait(3000);
-    cy.contains('Cancelar').click(); // Caso for testar o caminho de cadastro adicionar o comando a seguir: cy.contains('Escola criada com sucesso');
+    cy.contains('Cadastrar').click(); // Caso for testar o caminho de cadastro adicionar o comando a seguir: cy.contains('Escola criada com sucesso');
 
     cy.wait(2000);
     cy.contains('Sair do sistema').click();

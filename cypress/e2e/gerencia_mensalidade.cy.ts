@@ -1,9 +1,9 @@
 describe('Funcionalidade Gestão de Mensalidade', () => {
   beforeEach(() => {
-      cy.visit('http://localhost:3000/');
+      cy.visit('http://34.72.186.216:3000/');
   
       cy.get('input[name="username"]').type('lucas@gmail.com');
-      cy.get('input[name="password"]').type('1234');
+      cy.get('input[name="password"]').type('12345');
   
       cy.contains('Sign in with Credentials').click();
   
