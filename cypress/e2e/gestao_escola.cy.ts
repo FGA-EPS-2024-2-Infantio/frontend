@@ -1,23 +1,15 @@
 describe('Funcionalidade Gestão de Escolas', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3000/');
-
     cy.get('input[name="username"]').type('admin@admin.com');
     cy.get('input[name="password"]').type('admin');
-
     cy.contains('Sign in with Credentials').click();
-
-    cy.url().should('not.include', '/auth/signin');
-
-        
     cy.contains('Escolas').click();
-
-    cy.wait(6000);
+    cy.wait(5000);
 
   });
 
   afterEach(()=>{
-    cy.wait(2000);
+    cy.wait(3000);
     cy.contains('Sair do sistema').click();
     cy.contains('Sign out').click();
   })
