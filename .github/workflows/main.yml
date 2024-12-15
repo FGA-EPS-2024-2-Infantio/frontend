@@ -19,10 +19,10 @@ jobs:
           node-version: "18"
 
       - name: Instalando dependências
-        run: npm install
+        run: yarn install
 
       - name: Rodando Linter
-        run: npm run lint
+        run: yarn lint
 
       - name: Buildando o projeto
-        run: npm run build
+        run: yarn build
