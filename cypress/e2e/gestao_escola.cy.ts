@@ -1,6 +1,6 @@
 describe('Funcionalidade Gestão de Escolas', () => {
   beforeEach(() => {
-    cy.visit('http://34.72.186.216:3000/');
+    cy.visit('http://localhost:3000/');
 
     cy.get('input[name="username"]').type('admin@admin.com');
     cy.get('input[name="password"]').type('admin');
@@ -18,6 +18,8 @@ describe('Funcionalidade Gestão de Escolas', () => {
 
   afterEach(()=>{
     cy.wait(2000);
+    cy.contains('Sair do sistema').click();
+    cy.contains('Sign out').click();
   })
 
   it('Criar uma escola', () => {
@@ -31,11 +33,8 @@ describe('Funcionalidade Gestão de Escolas', () => {
     cy.get('input[id="numberStudents"]').type('10');
 
     cy.wait(3000);
-    cy.contains('Cadastrar').click(); // Caso for testar o caminho de cadastro adicionar o comando a seguir: cy.contains('Escola criada com sucesso');
+    cy.contains('Cancelar').click(); 
 
-    cy.wait(2000);
-    cy.contains('Sair do sistema').click();
-    cy.contains('Sign out').click();
   })
 
   it('Acessar perfil da Escola no modo administrador', ()=> {
@@ -45,9 +44,6 @@ describe('Funcionalidade Gestão de Escolas', () => {
     cy.wait(3000);
     cy.contains('Habilitada');
 
-    cy.wait(2000);
-    cy.contains('Sair do sistema').click();
-    cy.contains('Sign out').click();
   })
 
   it('Editar dados da escola aberta no modo administrador', ()=> {
@@ -65,9 +61,6 @@ describe('Funcionalidade Gestão de Escolas', () => {
 
     cy.contains('Salvar alterações').click();
 
-    cy.wait(2000);
-    cy.contains('Sair do sistema').click();
-    cy.contains('Sign out').click();
   })
 
   it('Desativar perfil da Escola no modo administrador', ()=> {
@@ -80,14 +73,6 @@ describe('Funcionalidade Gestão de Escolas', () => {
     cy.contains('Desativar escola').click();
 
     cy.contains('Não').click();
-
-    cy.wait(2000);
-    cy.contains('Sair do sistema').click();
-    cy.contains('Sign out').click();
   })
-
-  // it('Ativar perfil da Escola no modo administrador', ()=> {
-
-  // })
 
 })
