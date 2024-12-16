@@ -1,5 +1,6 @@
 describe('Funcionalidade Gestão de Escolas', () => {
   beforeEach(() => {
+    cy.visit('http://localhost:3000/');
     cy.get('input[name="username"]').type('admin@admin.com');
     cy.get('input[name="password"]').type('admin');
     cy.contains('Sign in with Credentials').click();

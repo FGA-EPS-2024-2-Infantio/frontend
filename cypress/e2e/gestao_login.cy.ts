@@ -1,5 +1,9 @@
 describe('Funcionalidade Login', () => {
 
+    beforeEach(()=>{
+      cy.visit('http://localhost:3000/');
+    })
+
     it('Não deve realizar login', () => {
         cy.get('input[name="username"]').type('admin@admin.com');
         cy.get('input[name="password"]').type('adm');
