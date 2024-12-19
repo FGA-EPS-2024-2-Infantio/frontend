@@ -7,7 +7,7 @@ import { SessionProvider } from 'next-auth/react'
 import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
 
-export function Providers({ children, session }: { children: React.ReactNode, session: Session | null }) {
+export function Providers({ children, session }: Readonly<{ children: React.ReactNode, session: Session | null }>) {
   return (
     <>
       <SessionProvider session={session}>

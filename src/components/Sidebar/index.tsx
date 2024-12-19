@@ -35,7 +35,7 @@ type Props = {
   session: Session // "ADMIN" | "TEACHER" | "DIRECTOR" | "USER"
 }
 
-export default function Sidebar({ session }: Props) {
+export default function Sidebar({ session }: Readonly<Props>) {
   const [collapsed, setCollapsed] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const router = useRouter()

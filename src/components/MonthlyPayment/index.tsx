@@ -17,7 +17,7 @@ export default function MonthlyPayment({
   loading,
   payments,
   studentId
-}: Props) {
+}: Readonly<Props>) {
 
     const columns: TableProps<MonthlyPaymentResponseDto>['columns'] = [
         {

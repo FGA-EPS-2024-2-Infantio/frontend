@@ -25,7 +25,7 @@ export default function ModalSaveClass({
   isModalOpen,
   setIsModalOpen,
   classToEdit
-}: Props) {
+}: Readonly<Props>) {
   const [form] = Form.useForm<CreateClassType>()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.class)
