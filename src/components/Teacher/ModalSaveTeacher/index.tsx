@@ -18,7 +18,7 @@ export default function ModalSaveTeacher({
   isModalOpen,
   setIsModalOpen,
   teacherToEdit
-}: Props) {
+}: Readonly<Props>) {
   const [form] = Form.useForm<CreateTeacherType>()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, schools } = useSelector((state: RootState) => state.teacher)

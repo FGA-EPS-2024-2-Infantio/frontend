@@ -23,7 +23,7 @@ export default function ModalCreatePayment({
   setPayment,
   monthlyPaymentToEdit,
   studentId
-}: Props) {
+}: Readonly<Props>) {
   const [form] = Form.useForm<MonthlyPaymentDto>()
 
   const handleCancel = () => {
@@ -120,7 +120,7 @@ export default function ModalCreatePayment({
           name='date'
           label='Mês/Ano'
           rules={[{
-            required: monthlyPaymentToEdit ? false : true, message: 'Necessário indicar a data de pagamento'
+            required: !monthlyPaymentToEdit, message: 'Necessário indicar a data de pagamento'
           }]}
          >
           <DatePicker 
@@ -128,7 +128,7 @@ export default function ModalCreatePayment({
               format: 'YYYY/MM',
               type: 'mask'
             }}
-            disabled={monthlyPaymentToEdit ? true : false}
+            disabled={!!monthlyPaymentToEdit}
             picker='month'
           />
         </Form.Item>

@@ -18,7 +18,7 @@ export default function ModalSaveSchool({
   isModalOpen,
   setIsModalOpen,
   schoolToEdit
-}: Props) {
+}: Readonly<Props>) {
   const [form] = Form.useForm<CreateSchoolType>()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.school)
@@ -109,7 +109,7 @@ export default function ModalSaveSchool({
           name='directorName'
           label='Nome do direitor'
           rules={[
-            { required: schoolToEdit ? false : true, message: 'Por favor, insira o nome do diretor' }
+            { required: !schoolToEdit, message: 'Por favor, insira o nome do diretor' }
           ]}
         >
           <Input placeholder='Nome da diretor' />
@@ -120,7 +120,7 @@ export default function ModalSaveSchool({
           label='E-mail do Diretor'
           rules={[
             {
-              required: schoolToEdit ? false : true,
+              required: !schoolToEdit,
               message: 'Por favor, insira o e-mail do diretor'
             },
             { type: 'email', message: 'Por favor, insira um e-mail válido' }
@@ -134,7 +134,7 @@ export default function ModalSaveSchool({
           label='Senha de acesso do diretor'
           rules={[
             {
-              required: schoolToEdit ? false : true,
+              required: !schoolToEdit,
               message: 'Por favor, insira a senha do diretor'
             },
             { required:true, message: 'Por favor, insira uma senha' }

@@ -7,7 +7,7 @@ type Props = {
   children: React.ReactNode
 }
 
-export default async function AuthLayout({ children }: Props) {
+export default async function AuthLayout({ children }: Readonly<Props>) {
   const session = await getServerSession(authOptions)
 
   if (!session) {

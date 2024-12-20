@@ -8,7 +8,7 @@ type Props = {
   }
 }
 
-export default async function Profile(props: Props) {
+export default async function Profile(props: Readonly<Props>) {
   const session = await getServerSession(authOptions)
   const url =
     process.env.NEXT_PUBLIC_API_URL + `/users/${props.params.profileId}`

@@ -70,7 +70,7 @@ export default function ModalCreateStudent({
   isModalOpen,
   setIsModalOpen,
   studentToEdit
-}: Props) {
+}: Readonly<Props>) {
   const [form] = Form.useForm<StudentDTO>()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.student)

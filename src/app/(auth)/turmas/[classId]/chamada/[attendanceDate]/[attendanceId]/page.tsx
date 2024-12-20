@@ -14,7 +14,6 @@ const Page = ({params}: {params: {classId: string, attendanceDate: string, atten
   const { classId, attendanceDate } = useParams();
   const [studentList, setStudentList] = useState<CreateAttendanceType[]>([]);
 
-  // const classIdStr = Array.isArray(classId) ? classId[0] : classId; // Comentado para ser der merda.
   const dispatch = useDispatch<AppDispatch>();
 
   const { classObj } = useSelector((state: RootState) => state.class);

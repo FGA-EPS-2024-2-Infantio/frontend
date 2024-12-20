@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
-export default function ClassDetails({params}: {params: {classId: string}}) {
+export default function ClassDetails({params}: Readonly<{params: {classId: string}}>) {
   const { classId } = useParams()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error, classObj } = useSelector(
