@@ -6,6 +6,10 @@ import { Button, Table, TableProps } from 'antd'
 import classNames from 'classnames'
 import { useState } from 'react'
 import ModalCreatePayment from './ModalCreatePayment'
+import { fetchDownloadCsv } from '@/store/slices/paymentSlice'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/store/store'
+import { toast } from 'react-toastify'
 
 type Props = {
   loading: boolean
@@ -18,6 +22,8 @@ export default function MonthlyPayment({
   payments,
   studentId
 }: Readonly<Props>) {
+
+  const dispatch = useDispatch<AppDispatch>();
 
     const columns: TableProps<MonthlyPaymentResponseDto>['columns'] = [
         {
@@ -46,10 +52,24 @@ export default function MonthlyPayment({
             sorter: (a, b) => a.value - b.value
         }
     ]
+  
+  const downloadCsv = async () => {
+    const action = await dispatch(fetchDownloadCsv(studentId));
 
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [payment, setPayment] = useState<MonthlyPaymentResponseDto>()
-    
+    if (fetchDownloadCsv.rejected.match(action)) {
+      toast.error(`Erro ao realizar o download`)
+    } else {
+      const blob = new Blob([action.payload], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+
+      toast.success(`Download realizado com sucesso`)
+    }
+  }
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [payment, setPayment] = useState<MonthlyPaymentResponseDto>()
+  
   const handleRowClick = (record: MonthlyPaymentResponseDto) => {
     setPayment(record)
     setIsModalOpen(true)
@@ -59,9 +79,14 @@ export default function MonthlyPayment({
         <div className='rounded-lg bg-white p-6 shadow-lg'>
             <div className='mb-4 flex items-center justify-between'>
                 <h2 className='text-lg font-semibold'>Gerenciamento de Pagamentos</h2>
-                <Button type='primary' onClick={() => setIsModalOpen(true)}>
-                    Adicionar Pagamento
-                </Button>
+                <div>
+                  <Button className='mr-2' type='primary' onClick={() => setIsModalOpen(true)}>
+                      Adicionar Pagamento
+                  </Button>
+                  <Button disabled={payments.length == 0} type='primary' onClick={() => downloadCsv()}>
+                      Exportar planilha
+                  </Button>
+                </div>
             </div>
             <Table<MonthlyPaymentResponseDto>
                 columns={columns}
