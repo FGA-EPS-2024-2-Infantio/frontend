@@ -25,6 +25,20 @@ const getAxiosErrorMessage = (error: unknown, defaultMessage: string) => {
 }
 
 
+export const fetchDownloadCsv = createAsyncThunk(
+  'payments/download',
+  async (studentId: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/monthlyPayment/download/${studentId}`)
+      return response.data
+    } catch (error: unknown) {
+      return rejectWithValue(
+        getAxiosErrorMessage(error, 'Ocorreu um erro')
+      )
+    }
+  }
+)
+
 export const createPayment = createAsyncThunk(
   'Payments/createPayment',
   async (paymentData: MonthlyPaymentDto, { rejectWithValue }) => {
@@ -100,6 +114,19 @@ const paymentSlice = createSlice({
         state.loading = false
         state.error = action.error.message || 'Erro ao atualizar pagamento'
       })
+
+      .addCase(fetchDownloadCsv.pending, state => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchDownloadCsv.fulfilled, (state) => {
+        state.loading = false
+      })
+      .addCase(fetchDownloadCsv.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
 
   }
 })
