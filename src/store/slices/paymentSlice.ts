@@ -119,7 +119,7 @@ const paymentSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(fetchDownloadCsv.fulfilled, (state, action) => {
+      .addCase(fetchDownloadCsv.fulfilled, (state) => {
         state.loading = false
       })
       .addCase(fetchDownloadCsv.rejected, (state, action) => {
