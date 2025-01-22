@@ -1,17 +1,28 @@
 'use client'
 
 import { Button, Form, Input, message } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { createTicket } from '@/store/slices/ticketSlice'
+import { TicketDTO } from '@/types/Tickets'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/store/store'
 
 export default function Suporte() {
   const [title, setTitle] = useState('')
   const [messageContent, setMessageContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const [form] = Form.useForm()
+
 
   const session = useSession()
-  const router = useRouter()
+
+
+ useEffect(() => {
+    console.log(session)
+  }, [])
 
   // Função para enviar o suporte
   const handleSubmit = async () => {
@@ -23,26 +34,21 @@ export default function Suporte() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/suporte', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          messageContent,
-        }),
-      })
+      const ticket: TicketDTO = {
+        title : title,
+        message : messageContent,
+        status : "OPEN",
+        directorId : session.data?.user.id || " ",
+        directorName: session.data?.user.name || " "
 
-      if (response.ok) {
-        message.success('Chamado de suporte enviado com sucesso!')
-        setTitle('')
-        setMessageContent('')
-      } else {
-        message.error('Erro ao enviar o chamado. Tente novamente!')
       }
+
+       await dispatch(createTicket(ticket)).unwrap();
+        message.success('Chamado de suporte enviado com sucesso!')
+        form.resetFields()
+  
     } catch (error) {
-      message.error('Erro na comunicação com o servidor!')
+        message.error('Erro ao enviar o chamado. Tente novamente!')
     } finally {
       setLoading(false)
     }
