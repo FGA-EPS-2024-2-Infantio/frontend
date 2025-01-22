@@ -75,6 +75,9 @@ export default function Sidebar({ session }: Readonly<Props>) {
     if (e.key === '6') {
       router.push(`/perfil/${session?.user.id}`)
     }
+    if (e.key === '7') {
+      router.push(`/chamados`)
+    }
     if (e.key === '8') {
       router.push('/suporte')
     }
