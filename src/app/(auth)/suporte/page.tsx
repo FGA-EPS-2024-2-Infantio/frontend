@@ -3,7 +3,6 @@
 import { Button, Form, Input, message } from 'antd'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { createTicket } from '@/store/slices/ticketSlice'
 import { TicketDTO } from '@/types/Tickets'
 import { useDispatch } from 'react-redux'
@@ -22,7 +21,7 @@ export default function Suporte() {
 
  useEffect(() => {
     console.log(session)
-  }, [])
+  }, [session])
 
   // Função para enviar o suporte
   const handleSubmit = async () => {
@@ -43,12 +42,13 @@ export default function Suporte() {
 
       }
 
-       await dispatch(createTicket(ticket)).unwrap();
-        message.success('Chamado de suporte enviado com sucesso!')
-        form.resetFields()
+      await dispatch(createTicket(ticket)).unwrap();
+      message.success('Chamado de suporte enviado com sucesso!');
+      setTitle("");
+      setMessageContent("");
   
     } catch (error) {
-        message.error('Erro ao enviar o chamado. Tente novamente!')
+        message.error(error + 'Erro ao enviar o chamado. Tente novamente!')
     } finally {
       setLoading(false)
     }
@@ -70,7 +70,7 @@ export default function Suporte() {
         <h2 className='text-lg font-semibold'>Suporte</h2>
       </div>
 
-      <Form layout='vertical' onFinish={handleSubmit}>
+      <Form form={form} layout='vertical' onFinish={handleSubmit}>
         <Form.Item
           label='Título'
           name='title'
