@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/store/store'
-import { fetchTickets } from '@/store/slices/ticketSlice'
-import { toast } from 'react-toastify'
-import { TicketDTO } from '@/types/Tickets'
 import TicketModal from '@/components/chamados/TicketModal'
+import { fetchTickets } from '@/store/slices/ticketSlice'
+import { AppDispatch, RootState } from '@/store/store'
+import { TicketDTO } from '@/types/Tickets'
 import { Select } from 'antd'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 
 
 export default function Suporte() {
@@ -137,6 +137,11 @@ export default function Suporte() {
           {sortedTickets.map((ticket) => (
            <li
            onClick={ () => handleCardClick(ticket)}
+           onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleCardClick(ticket);
+            }
+          }}
            key={ticket.id}
            className="rounded-lg border border-gray-300 p-6 shadow-md hover:shadow-lg transition-shadow hover:border-green-400 active:bg-gray-200 active:scale-95 cursor-pointer"
          >
@@ -161,7 +166,7 @@ export default function Suporte() {
            <div className="text-sm  space-y-1">
              <div>
                <span className="font-bold">Data:</span>{' '}
-               {new Date(ticket.createdAt).toLocaleDateString('pt-BR')}
+               {new Date(ticket.createdAt as Date).toLocaleDateString('pt-BR')}
              </div>
              <div>
                <span className="font-bold">Criado por:</span> {ticket.directorName}

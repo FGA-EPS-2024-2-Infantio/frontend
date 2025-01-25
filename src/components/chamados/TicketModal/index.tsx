@@ -1,11 +1,11 @@
 'use client'
 
+import { updateTicket } from '@/store/slices/ticketSlice'
+import { AppDispatch } from '@/store/store'
+import { TicketDTO } from '@/types/Tickets'
 import { Button, Form, Input, Modal, message } from 'antd'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/store/store'
-import { TicketDTO } from '@/types/Tickets'
-import { updateTicket } from '@/store/slices/ticketSlice'
 
 interface TicketModalProps {
   ticket: TicketDTO
@@ -34,12 +34,12 @@ const TicketModal: React.FC<TicketModalProps> = ({ ticket, isModalOpen, onClose 
         status: 'CLOSED', 
       }
 
-      await dispatch(updateTicket({id: ticket.id, data: responseTicket})).unwrap()
+      await dispatch(updateTicket({id: ticket.id ?? "", data: responseTicket})).unwrap()
       message.success('Resposta enviada com sucesso!')
       form.resetFields()
       setResponseMessage('')
       onClose() 
-    } catch (error) {
+    } catch {
       message.error('Erro ao enviar a resposta. Tente novamente!')
     } finally {
       setLoading(false)
@@ -79,7 +79,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ ticket, isModalOpen, onClose 
         <div className="text-sm space-y-1">
           <div>
             <span className="font-bold">Data:</span>{' '}
-            {new Date(ticket.createdAt).toLocaleDateString('pt-BR')}
+            {new Date(ticket.createdAt as Date).toLocaleDateString('pt-BR')}
           </div>
           <div>
             <span className="font-bold">Criado por:</span> {ticket.directorName}
