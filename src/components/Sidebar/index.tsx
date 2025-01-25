@@ -5,7 +5,8 @@ import {
   HomeOutlined,
   LogoutOutlined,
   TeamOutlined,
-  UserOutlined
+  UserOutlined,
+  PhoneOutlined
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Button, Layout, Menu } from 'antd'
@@ -43,14 +44,16 @@ export default function Sidebar({ session }: Readonly<Props>) {
   const items: MenuItem[] = [
     session.user.role === 'ADMIN' && getItem('Escolas', '1', <HomeOutlined />),
     (session.user.role === 'DIRECTOR') &&
-      getItem('Alunos', '2', <UserOutlined />),
+    getItem('Alunos', '2', <UserOutlined />),
     (session.user.role === 'DIRECTOR') &&
-      getItem('Professores', '3', <TeamOutlined />),
+    getItem('Professores', '3', <TeamOutlined />),
     (session.user.role === 'DIRECTOR') &&
-      getItem('Turmas', '4', <BookOutlined />),
+    getItem('Turmas', '4', <BookOutlined />),
     (session.user.role === 'TEACHER') &&
-      getItem('Minhas turmas', '5', <BookOutlined />),
-    getItem('Perfil', '6', <UserOutlined />)
+    getItem('Minhas turmas', '5', <BookOutlined />),
+    getItem('Perfil', '6', <UserOutlined />),
+    session.user.role === 'ADMIN' && getItem('Chamados', '7', <BookOutlined />),
+    session.user.role === 'DIRECTOR' && getItem('Suporte', '8', <PhoneOutlined />)
   ].filter(Boolean) as MenuItem[]
 
   const handleMenuClick: MenuProps['onClick'] = e => {
@@ -71,6 +74,12 @@ export default function Sidebar({ session }: Readonly<Props>) {
     }
     if (e.key === '6') {
       router.push(`/perfil/${session?.user.id}`)
+    }
+    if (e.key === '7') {
+      router.push(`/chamados`)
+    }
+    if (e.key === '8') {
+      router.push('/suporte')
     }
   }
 

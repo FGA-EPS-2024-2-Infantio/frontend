@@ -6,6 +6,7 @@ import paymentSlice from './slices/paymentSlice'
 import schoolSlice from './slices/schoolSlice'
 import studentSlice from './slices/studentSlice'
 import teacherSlice from './slices/teacherSlice'
+import ticketSlice from './slices/ticketSlice'
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     student: studentSlice,
     class: classSlice,
     attendence: attendanceSlice,
-    payment: paymentSlice
+    payment: paymentSlice,
+    ticket: ticketSlice
   }
 })
 
