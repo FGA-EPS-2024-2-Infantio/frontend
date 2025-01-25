@@ -1,54 +1,44 @@
 'use client'
 
-import { Button, Form, Input, message } from 'antd'
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
 import { createTicket } from '@/store/slices/ticketSlice'
-import { TicketDTO } from '@/types/Tickets'
-import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/store/store'
+import { TicketDTO } from '@/types/Tickets'
+import { Button, Form, Input, message } from 'antd'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 export default function Suporte() {
-  const [title, setTitle] = useState('')
-  const [messageContent, setMessageContent] = useState('')
   const [loading, setLoading] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const [form] = Form.useForm()
-
-
   const session = useSession()
 
-
- useEffect(() => {
+  useEffect(() => {
     console.log(session)
   }, [session])
 
   // Função para enviar o suporte
   const handleSubmit = async () => {
-    if (!title || !messageContent) {
-      message.error('Por favor, preencha todos os campos.')
-      return
-    }
-
-    setLoading(true)
-
     try {
-      const ticket: TicketDTO = {
-        title : title,
-        message : messageContent,
-        status : "OPEN",
-        directorId : session.data?.user.id || " ",
-        directorName: session.data?.user.name || " "
+      await form.validateFields() // Valida os campos antes de prosseguir
 
+      setLoading(true)
+
+      const ticket: TicketDTO = {
+        title: form.getFieldValue('title'),
+        message: form.getFieldValue('message'),
+        status: "OPEN",
+        directorId: session.data?.user.id || " ",
+        directorName: session.data?.user.name || " "
       }
 
-      await dispatch(createTicket(ticket)).unwrap();
-      message.success('Chamado de suporte enviado com sucesso!');
-      setTitle("");
-      setMessageContent("");
-  
+      await dispatch(createTicket(ticket)).unwrap()
+      message.success('Chamado de suporte enviado com sucesso!')
+      form.resetFields() // Limpa os campos do formulário após o envio bem-sucedido
+
     } catch (error) {
-        message.error(error + 'Erro ao enviar o chamado. Tente novamente!')
+      message.error(error + 'Erro ao enviar o chamado. Tente novamente!')
     } finally {
       setLoading(false)
     }
@@ -76,11 +66,7 @@ export default function Suporte() {
           name='title'
           rules={[{ required: true, message: 'Por favor, insira um título!' }]}
         >
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder='Digite o título do chamado'
-          />
+          <Input placeholder='Digite o título do chamado' />
         </Form.Item>
 
         <Form.Item
@@ -88,12 +74,7 @@ export default function Suporte() {
           name='message'
           rules={[{ required: true, message: 'Por favor, insira uma mensagem!' }]}
         >
-          <Input.TextArea
-            value={messageContent}
-            onChange={(e) => setMessageContent(e.target.value)}
-            placeholder='Digite a mensagem do chamado'
-            rows={4}
-          />
+          <Input.TextArea placeholder='Digite a mensagem do chamado' rows={4} />
         </Form.Item>
 
         <Form.Item>
