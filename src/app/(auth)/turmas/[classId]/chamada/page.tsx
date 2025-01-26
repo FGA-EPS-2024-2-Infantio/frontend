@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { createAttendance } from "@/store/slices/attendanceSlice";
 import { fetchStudents } from "@/store/slices/studentSlice";
@@ -11,6 +11,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const Page = () => {
   const { classId } = useParams();
@@ -47,6 +49,62 @@ const Page = () => {
     const studentIndex = studentList.findIndex(student => student.studentId === event.target.id);
     studentList[studentIndex].hasAttended = isChecked;
   }
+
+  const handleGeneratePDF = () => {
+    if (!classObj) {
+      toast.error("Informações da turma não estão carregadas!");
+      return;
+    }
+  
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+  
+    doc.setFont("Helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+  
+    doc.setFontSize(18);
+    doc.text("Lista de Presença", 105, 20, { align: "center" });
+  
+    doc.setFontSize(12);
+    doc.text(`Turma: ${classObj.name}`, 10, 30);
+    doc.text(`Professor: ${classObj.teacher.name}`, 10, 40);
+    doc.text(`Data: ${selectedDate.toLocaleDateString("pt-BR")}`, 10, 50);
+  
+    doc.line(10, 55, 200, 55);
+  
+    const tableData = classObj.students.map((student, index) => [
+      index + 1,
+      student.name,
+      "[    ]",
+    ]);
+  
+    autoTable(doc, {
+      startY: 60,
+      head: [["Nº", "Nome do Aluno", "Presença"]],
+      body: tableData,
+      headStyles: {
+        fillColor: [200, 200, 200],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+      },
+      bodyStyles: {
+        textColor: [0, 0, 0],
+        lineColor: [0, 0, 0],
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240],
+      },
+      styles: {
+        font: "Helvetica",
+        fontSize: 10,
+      },
+    });
+
+    doc.save(`chamada_turma_${classObj.name}.pdf`);
+  };
 
   type DataType = {
     studentId: string,
@@ -108,8 +166,13 @@ const Page = () => {
     <Form.Item<Date>
       label={<span style={{ fontWeight: 'bold', fontSize: '16px' }}>Escolha a data</span>}
     >
-      <DatePicker onChange={handleDateChange} 
-      style={{ width: '30%', height: '40px', fontSize: '20px' }}/>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <DatePicker onChange={handleDateChange} 
+        style={{ width: '30%', height: '40px', fontSize: '20px' }}/>
+
+        <Button type="primary" htmlType="submit" 
+        onClick={handleGeneratePDF}> Gerar PDF </Button>
+      </div>
     </Form.Item>
 
     <Divider />
