@@ -2,7 +2,7 @@
 
 import { fetchClassDetails } from '@/store/slices/classSlice'
 import { AppDispatch, RootState } from '@/store/store'
-import { Spin, Table } from 'antd'
+import { Button, Spin, Table } from 'antd'
 import classNames from 'classnames'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -62,12 +62,12 @@ export default function ClassDetailsPage() {
 
   return (
     <div className='mx-6 space-y-4 rounded-lg bg-white p-6 shadow-lg'>
-      {/* <div className='mb-4 flex items-center justify-between'>
+      <div className='mb-4 flex items-center justify-between'>
         <h2 className='text-xl font-semibold text-gray-800'>{classData.name}</h2>
-        <Button type='primary' onClick={() => console.log('Iniciar chamada')}>
+        <Button type='primary' onClick={() => router.push(`tele_professor/turmas/${classId}/chamada`)}>
           Chamada
         </Button>
-      </div> */}
+      </div>
 
       <div className='space-y-6'>
         <div>
