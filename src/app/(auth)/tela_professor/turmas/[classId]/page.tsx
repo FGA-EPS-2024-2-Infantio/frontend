@@ -64,7 +64,7 @@ export default function ClassDetailsPage() {
     <div className='mx-6 space-y-4 rounded-lg bg-white p-6 shadow-lg'>
       <div className='mb-4 flex items-center justify-between'>
         <h2 className='text-xl font-semibold text-gray-800'>{classData.name}</h2>
-        <Button type='primary' onClick={() => router.push(`tele_professor/turmas/${classId}/chamada`)}>
+        <Button type='primary' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
           Chamada
         </Button>
       </div>
