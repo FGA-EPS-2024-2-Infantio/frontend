@@ -40,7 +40,7 @@ const Page = () => {
   useEffect(() => {
     dispatch(fetchStudents(session.data?.user.id ?? ""))
     const students: CreateAttendanceType[] = []
-    classObj?.students.forEach(student => students.push({ studentId: student.id, classId: classIdStr, date: new Date(), hasAttended: false }))
+    classObj?.students.forEach(student => students.push({ studentId: student.id, classId: classIdStr, date: new Date(), hasAttended: false, entryTime: null, exitTime: null }))
     setStudentList(students)
   }, [dispatch, session.data?.user.id])
 
