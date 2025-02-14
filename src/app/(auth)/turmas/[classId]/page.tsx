@@ -198,7 +198,7 @@ export default function ClassDetails({params}: Readonly<{params: {classId: strin
           </p>
           <Button type='primary' size='large' onClick={() => router.push(`/turmas/${classId}/chamada`)}>
             + Criar nova chamada
-          </Button  >
+          </Button>
         </div>
       </div>
 

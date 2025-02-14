@@ -82,6 +82,19 @@ export default function StudentDetails() {
       .catch(error => toast.error(`Erro: ${error.message}`))
   }, [dispatch, studentIdStr])
 
+  const formatPhoneNumber = (phone: string | undefined) => {
+    if (!phone) return null;
+    // Remove tudo que não for número
+    return phone.replace(/\D/g, '');
+  }
+
+  const openWhatsApp = (phone: string | undefined) => {
+    const formattedPhone = formatPhoneNumber(phone);
+    if (formattedPhone) {
+      window.open(`https://wa.me/55${formattedPhone}`, '_blank');
+    }
+  }
+
   const actionMenuItems = useMemo(() => {
     const items = []
 
@@ -107,13 +120,27 @@ export default function StudentDetails() {
       })
     }
 
+    if (student?.mae?.telefone) {
+      items.push({
+        key: 'contactMother',
+        label: <span onClick={() => openWhatsApp(student.mae?.telefone)}>Contatar mãe</span>
+      })
+    }
+
+    if (student?.pai?.telefone) {
+      items.push({
+        key: 'contactFather',
+        label: <span onClick={() => openWhatsApp(student.pai?.telefone)}>Contatar pai</span>
+      })
+    }
+
     items.push({
         key: 'copyToClipboard',
         label: <span onClick={copyToClipboard}>Copiar link</span>
     })
 
     return items
-  }, [handleDeactivateStudent, student?.disabled])
+  }, [handleDeactivateStudent, student?.disabled, student?.mae?.telefone, student?.pai?.telefone])
 
   const session = useSession()
 

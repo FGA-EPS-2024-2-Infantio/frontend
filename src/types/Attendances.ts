@@ -3,6 +3,8 @@ export type CreateAttendanceType = {
     classId: string,
     date: Date,
     hasAttended: boolean,
+    entryTime: Date | null,
+    exitTime: Date | null,
   }
   
   export type AttendanceResponseDto = {
@@ -11,5 +13,6 @@ export type CreateAttendanceType = {
     studentName: string
     date: Date;
     hasAttended: boolean
+    entryTime: Date | null;
+    exitTime: Date | null;
   }
-  

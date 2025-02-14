@@ -3,12 +3,13 @@
 import { fetchAttendanceByDateAndClass, updateAttendance } from "@/store/slices/attendanceSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { CreateAttendanceType } from "@/types/Attendances";
-import { Button, Checkbox, Divider, Form, FormProps, Spin, Table, TableProps, Typography } from "antd";
+import { Button, Checkbox, Divider, Form, FormProps, Spin, Table, TableProps, Typography, TimePicker } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import dayjs from 'dayjs';
 
 const Page = ({params}: {params: {classId: string, attendanceDate: string, attendanceId: string}}) => {
   const { classId, attendanceDate } = useParams();
@@ -24,8 +25,6 @@ const Page = ({params}: {params: {classId: string, attendanceDate: string, atten
   useEffect(() => {
     if (attendanceDate && classId) {
       const decodedDate = decodeURIComponent(params.attendanceDate);
-      console.log("decoded", decodedDate);
-      console.log("id", classId);
       dispatch(fetchAttendanceByDateAndClass({ date: decodedDate, classId: params.classId }));
     }
   }, [dispatch, attendanceDate, classId, params.attendanceDate, params.classId]);
@@ -45,6 +44,8 @@ const Page = ({params}: {params: {classId: string, attendanceDate: string, atten
           classId: params.classId,
           date: formattedDate ? new Date(formattedDate) : new Date(),
           hasAttended: attendance ? attendance.hasAttended : false,
+          entryTime: attendance?.entryTime ? new Date(attendance.entryTime) : null,
+          exitTime: attendance?.exitTime ? new Date(attendance.exitTime) : null,
         };
       });
       
@@ -69,6 +70,18 @@ const Page = ({params}: {params: {classId: string, attendanceDate: string, atten
     setStudentList(updatedStudentList);
   };
 
+  const handleTimeChange = (studentId: string, type: 'entry' | 'exit', time: Date | null) => {
+    setStudentList(prev => prev.map(student => {
+      if (student.studentId === studentId) {
+        return {
+          ...student,
+          [type === 'entry' ? 'entryTime' : 'exitTime']: time
+        };
+      }
+      return student;
+    }));
+  };
+
   type DataType = {
     studentId: string;
     studentName: string;
@@ -91,6 +104,36 @@ const Page = ({params}: {params: {classId: string, attendanceDate: string, atten
           onChange={handleChange}
         />
       ),
+    },
+    {
+      title: "Horário de Entrada",
+      key: "entryTime",
+      render: (_, record) => {
+        const attendance = studentList.find(a => a.studentId === record.studentId);
+        return (
+          <TimePicker
+            format="HH:mm"
+            value={attendance?.entryTime ? dayjs(attendance.entryTime) : null}
+            onChange={(time) => handleTimeChange(record.studentId, 'entry', time?.toDate() || null)}
+            disabled={!attendance?.hasAttended}
+          />
+        );
+      },
+    },
+    {
+      title: "Horário de Saída",
+      key: "exitTime",
+      render: (_, record) => {
+        const attendance = studentList.find(a => a.studentId === record.studentId);
+        return (
+          <TimePicker
+            format="HH:mm"
+            value={attendance?.exitTime ? dayjs(attendance.exitTime) : null}
+            onChange={(time) => handleTimeChange(record.studentId, 'exit', time?.toDate() || null)}
+            disabled={!attendance?.hasAttended}
+          />
+        );
+      },
     },
   ];
 
